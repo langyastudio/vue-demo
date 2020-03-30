@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>进入/离开&列表过渡</title>
+
+    <style>
+        /*常用的过渡都是使用 CSS 过渡。*/
+        /*定义过渡的过程时间，延迟和曲线函数。*/
+        .fade-enter-active, .fade-leave-active {
+            transition : opacity .5s;
+        }
+
+        .fade-enter, .fade-leave-to {
+            opacity : 0;
+        }
+
+        /*1.0 CSS 过渡*/
+        .slide-fade-enter, .slide-fade-leave-to {
+            opacity   : 0;
+            transform : translateX(10px);
+        }
+
+        .slide-fade-enter-active {
+            transition : all .3s ease;
+        }
+
+        .slide-fade-leave-active {
+            transition : all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+
+        /*2.0 CSS 动画*/
+        .bounce-enter-active{
+            animation: bounce-in .5s;
+        }
+        .bounce-leave-active{
+            animation: bounce-in .5s reverse;
+        }
+        @keyframes bounce-in {
+            0%{
+                transform: scale(0);
+            }
+            50%{
+                transform: scale(1.5);
+            }
+            100%{
+                transform: scale(1);
+            }
+        }
+
+        .list-enter-active, .list-leave-active {
+            transition : all 1s;
+        }
+
+        .list-enter, .list-leave-to
+            /* .list-leave-active for below version 2.1.8 */
+        {
+            opacity   : 0;
+            transform : translateY(30px);
+        }
+        /*还可以改变定位，要使用这个新功能只需了解新增的 v-move 特性*/
+        .list-move {
+            transition : transform 1s;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="demo">
+    <button @click="show = !show">
+        Toggle
+    </button>
+    <!--【1.0】单元素/组件的过渡-->
+    <!--Vue 提供了 transition 的封装组件，在下列情形中，可以给任何元素和组件添加进入/离开过渡-->
+    <!--条件渲染 (使用 v-if)-->
+    <!--条件展示 (使用 v-show)-->
+    <!--动态组件-->
+    <!--组件根节点-->
+
+    <!--https://cn.vuejs.org/images/transition.png-->
+    <!--CSS 过渡-->
+    <transition name="fade">
+        <p v-if="show">fade</p>
+    </transition>
+    <transition name="slide-fade">
+        <p v-if="show">slide-fade</p>
+    </transition>
+
+    <!--CSS 动画-->
+    <transition name="bounce">
+        <p v-if="show">CSS 动画</p>
+    </transition>
+
+    <!--自定义过渡的类名-->
+    <!--这对于 Vue 的过渡系统和其他第三方 CSS 动画库结合非常有利-->
+    <!--enter-class-->
+    <!--enter-active-class-->
+    <!--enter-to-class (2.1.8+)-->
+    <!--leave-class-->
+    <!--leave-active-class-->
+    <!--leave-to-class (2.1.8+)-->
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+    <transition name="custom-classes-transition"
+                enter-active-class="animated tada"
+                leave-active-class="animated bounceOutRight">
+        <p v-if="show">自定义过渡的类名</p>
+    </transition>
+    <!--同时使用过渡和动画-->
+    <!--比如 animation 很快的被触发并完成了，而 transition 效果还没结束。
+    在这种情况中，你就需要使用 type 特性并设置 animation 或 transition 来明确声明你需要 Vue 监听的类型-->
+
+    <!--显性的过渡持续时间[2.2.0 新增]-->
+    <!--其中一些嵌套的内部元素相比于过渡效果的根元素有延迟的或更长的过渡效果。-->
+    <!--可以用 <transition> 组件上的 duration 属性定制一个显性的过渡持续时间 (以毫秒计)：-->
+    <!--<transition :duration="{ enter: 500, leave: 800 }">...</transition>-->
+
+    <button @click="showing = !showing">
+        Toggle
+    </button>
+
+    <!--JavaScript 钩子-->
+    <transition
+        @before-enter="beforeEnter"
+        @enter="enter"
+        @after-enter="afterEnter"
+        @enter-cancelled="enterCancelled"
+
+        @before-leave="beforeLeave"
+        @leave="leave"
+        @after-leave="afterLeave"
+        @leave-cancelled="leaveCancelled"
+
+        :css="false"
+    >
+        <p v-if="showing">
+            JavaScript 钩子
+        </p>
+    </transition>
+
+    <!--【1.1】初始渲染的过渡
+    <!--可以通过 appear 特性设置节点在初始渲染的过渡-->
+    <!--<transition-->
+        <!--appear-->
+        <!--appear-class="custom-appear-class"-->
+        <!--appear-to-class="custom-appear-to-class" (2.1.8+)-->
+        <!--appear-active-class="custom-appear-active-class"-->
+    <!--&gt;-->
+    <!--</transition>-->
+
+    <!--【1.2】多个元素的过渡-->
+    <!--最常见的多标签过渡是一个列表和描述这个列表为空消息的元素-->
+    <transition>
+        <button v-if="isSaving" key="save">
+            Save
+        </button>
+        <button v-else key="edit">
+            Edit
+        </button>
+    </transition>
+
+    <!--Vue 提供了 过渡模式-->
+    <!--in-out：新元素先进行过渡，完成之后当前元素过渡离开。-->
+    <!--out-in：当前元素先进行过渡，完成之后新元素过渡进入。-->
+    <transition name="fade" mode="out-in">
+        <p v-if="showing">过渡模式</p>
+    </transition>
+
+    <!--【1.3】多个组件的过渡-->
+    <!--只需要使用动态组件-->
+    <!--<component :is="view"></component>-->
+
+    <!--【1.4】列表过渡-->
+    <!--<transition-group> 组件-->
+    <!--不同于 <transition>，它会以一个真实元素呈现：默认为一个 <span>。你也可以通过 tag 特性更换为其他元素。-->
+    <!--过渡模式不可用，因为我们不再相互切换特有的元素。-->
+    <!--内部元素 总是需要 提供唯一的 key 属性值。-->
+    <br>
+    <button @click="shuffle">Shuffle</button>
+    <button @click="add">Add</button>
+    <button @click="remove">Remove</button>
+    <transition-group name="list" tag="ul">
+        <li v-for="item in items" :key="item">
+          {{ item }}
+        </li>
+    </transition-group>
+
+    <!--过渡可以通过 Vue 的组件系统实现复用。要创建一个可复用过渡组件，
+    你需要做的就是将 <transition> 或者 <transition-group> 作为根组件-->
+    
+
+
+</div>
+
+<script src="/test-vue/libs/vue.js"></script>
+<script src="/test-vue/libs/velocity.min.js"></script>
+<script src="/test-vue/libs/lodash.min.js"></script>
+<script>
+    var vm = new Vue({
+        el  : "#demo",
+        data: {
+            show   : true,
+            showing: false,
+            isSaving: false,
+            items: [1,2,3,4,5,6,7,8,9],
+            nextNum: 10
+        },
+        methods: {
+            // 可以结合 CSS transitions/animations 使用
+            // 当只用 JavaScript 过渡的时候，在 enter 和 leave 中必须使用 done 进行回调。否则，它们将被同步调用，过渡会立即完成。
+            // 推荐对于仅使用 JavaScript 过渡的元素添加 v-bind:css="false"，Vue 会跳过 CSS 的检测
+            // --------
+            // 进入中
+            // --------
+            beforeEnter: function (el) {
+                el.style.opacity         = 0;
+                el.style.transformOrigin = 'left';
+            },
+            // 此回调函数是可选项的设置
+            // 与 CSS 结合时使用
+            enter: function (el, done) {
+                Velocity(el, {opacity: 1, fontSize: '1.4em'}, {duration: 300});
+                Velocity(el, {fontSize: '1em'}, {complete: done});
+                //done();
+            },
+            afterEnter: function (el) {
+                // ...
+            },
+            enterCancelled: function (el) {
+                // ...
+            },
+
+            // --------
+            // 离开时
+            // --------
+            beforeLeave: function (el) {
+                // ...
+            },
+            // 此回调函数是可选项的设置
+            // 与 CSS 结合时使用
+            leave: function (el, done) {
+                Velocity(el, {translateX: '15px', rotateZ: '50deg'}, {duration: 600});
+                Velocity(el, {rotateZ: '100deg'}, {loop: 2});
+                Velocity(el, {
+                    rotateZ   : '45deg',
+                    translateY: '30px',
+                    translateX: '30px',
+                    opacity   : 0
+                }, {complete: done});
+                //done()
+            },
+            afterLeave: function (el) {
+                // ...
+            },
+            // leaveCancelled 只用于 v-show 中
+            leaveCancelled: function (el) {
+                // ...
+            },
+
+            randomIndex: function () {
+                return Math.floor(Math.random() * this.items.length)
+            },
+            shuffle: function () {
+                this.items = _.shuffle(this.items)
+            },
+            add: function () {
+                this.items.splice(this.randomIndex(), 0, this.nextNum++)
+            },
+            remove: function () {
+                this.items.splice(this.randomIndex(), 1)
+            },
+        }
+    });
+</script>
+</body>
+</html>

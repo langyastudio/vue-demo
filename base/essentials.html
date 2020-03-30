@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基础(模版、计算属性、Class、条件/列表渲染)</title>
+
+    <style>
+        .elem-magrin {
+            margin-top : 20px;
+        }
+
+        .elem-font-h1 {
+            font-size   : 20px;
+            font-weight : 600;
+            line-height : 30px;
+        }
+    </style>
+</head>
+
+<body>
+<!--https://cn.vuejs.org/images/lifecycle.png-->
+<!--特性-->
+<div id="app" :title="title">
+
+    <!--文本-->
+    <!--v-once 指令，能执行一次性地插值-->
+    <div>
+        Message: {{ message }}
+    </div>
+    <!--模板表达式都被放在沙盒中，只能访问全局变量的一个白名单，如 Math 和 Date 。你不应该在模板表达式中试图访问用户定义的全局变量。-->
+    <div>
+        Message: {{ message + '-expression'}}
+    </div>
+    <div>
+        Reverse Message: {{ reversedMessage  }}
+    </div>
+
+    <!--原始 HTML-->
+    <!--很危险，避免XSS 攻击-->
+    <div>
+        Using v-html directive:<div v-html="rawHtml"></div>
+    </div>
+
+    <!--Directives-->
+    <!--v-bind | v-on-->
+    <button @click="reverseMessage">逆转消息</button>
+
+    <!--Class 与 Style 绑定-->
+    <!--v-bind 用于 class 和 style 时，表达式结果的类型除了字符串之外，还可以是对象或数组-->
+    <!--当在一个自定义组件上使用 class 属性时，这些类将被添加到该组件的根元素上面。这个元素上已经存在的类不会被覆盖。-->
+    <div class="elem-magrin">
+        <span class="static" :class="{ 'elem-font-h1':isActive, 'text-danger':hasError}">内联定义在模板里</span>
+        <span :class="classObject">对象</span>
+
+        <div :style="styleObject">styleObject</div>
+    </div>
+
+    <!--v-if-->
+    <h1 v-if="ok">YES</h1>
+    <h1 v-else>NO</h1>
+
+    <!--用-key-管理可复用的元素-->
+    <template v-if="loginType === 'username'">
+        <label>Username</label>
+        <input placeholder="Enter your username" key="username-input">
+    </template>
+    <template v-else>
+        <label>Email</label>
+        <input placeholder="Enter your email address" key="email-input">
+    </template>
+
+    <!--v-show 不支持 <template> 元素，也不支持 v-else。-->
+    <!--v-show 的元素始终会被渲染并保留在 DOM 中。v-show 只是简单地切换元素的 CSS 属性 display。适合非常频繁地切换的场景-->
+    <h1 v-show="ok">Hello!</h1>
+
+    <!--v-for-->
+    <!--v-for 还支持一个可选的第二个参数为当前项的索引。-->
+    <ul>
+        <li v-for="todo in todolist" :key="todo.id">{{ todo.text }}</li>
+        <li v-for="(item, index) in todolist" :key="item.id + 'ex'">{{index}} - {{ item.text }}</li>
+    </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script>
+    var vm = new Vue({
+        el      : '#app',
+        data    : {
+            title  : 'new title',
+            message: 'Hello Vue!',
+            rawHtml: "<span style='color: red'>This shoud be red</span>",
+
+            loginType: 'username',
+
+            ok: false,
+
+            isActive: true,
+            hasError: false,
+
+            styleObject: {
+                color   : 'red',
+                fontSize: '13px',
+            },
+
+            todolist: [
+                {id: '1', text: '测试1'},
+                {id: '2', text: '测试2'},
+                {id: '3', text: '测试3'},
+            ],
+        },
+        // 计算属性
+        // 计算属性只有在它的 相关依赖 发生改变时才会重新求值
+        computed: {
+            //默认只有 getter ，
+            reversedMessage: function () {
+                return this.message.split(' ').reverse().join(' ');
+            },
+            fullName       : {
+                // getter
+                get: function () {
+                    return this.firstName + ' ' + this.lastName
+                },
+                // setter
+                set: function (newValue) {
+                    var names      = newValue.split(' ');
+                    this.firstName = names[0];
+                    this.lastName  = names[names.length - 1];
+                }
+            },
+            classObject    : function () {
+                return {
+                    'elem-font-h1': this.isActive,
+                    'text-danger' : this.hasError
+                };
+            }
+        },
+        // 侦听属性 watch 回调
+        // 当需要在数据变化时执行异步或开销较大的操作时
+        watch   : {},
+        methods : {
+            reverseMessage: function () {
+                this.message = this.message.split(' ').reverse().join(' ');
+            }
+        }
+    });
+
+    //数组更新
+    //1.0 变异方法，会改变被这些方法调用的原始数组
+    // push()
+    // pop()
+    // shift()
+    // unshift()
+    // splice()
+    // sort()
+    // reverse()
+    vm.todolist.push({id: '4', text: '测试4'});
+    //2.0 替换数组
+    // filter(), concat() 和 slice()
+    vm.todolist = vm.todolist.filter(function (item) {
+        item.text = item.text + '-filter';
+        return item;
+    });
+    //3.0 由于 JavaScript 的限制，Vue 不能检测以下变动的数组：
+    //     当你利用索引直接设置一个项时，例如：vm.items[indexOfItem] = newValue
+    //     当你修改数组的长度时，例如：vm.items.length = newLength
+    // Array.prototype.splice
+    // vm.items.splice(indexOfItem, 1, newValue)
+    // OR Vue.set(vm.items, indexOfItem, newValue)
+    // newLength
+    // vm.items.splice(newLength)
+
+    //Vue 不能检测对象属性的添加或删除（可使用Vue.set(object, key, value) 方法向嵌套对象添加响应式属性）
+    //为已有对象赋予多个响应式的新属性
+    vm.styleObject = Object.assign({}, vm.styleObject, {
+        fontSize: '24px',
+        color: 'green'
+    });
+
+
+</script>
+</body>
+</html>

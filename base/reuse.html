@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>可复用性 & 组合</title>
+
+</head>
+
+<body>
+<div id="reuse">
+    <!--directives-->
+    <input v-focus>
+
+    <!--过滤器-->
+    <input v-model="message">{{ message|capitalize }}</input>
+
+    <div id="hook-arguments-example" v-demo:foo.a.b="message"></div>
+</div>
+
+<script src="/test-vue/libs/vue.js"></script>
+<script>
+    //【1】mixins
+    // 混入 (mixins) 是一种分发 Vue 组件中可复用功能的非常灵活的方式。
+    // 混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被混入该组件本身的选项
+
+    // 定义一个混入对象
+    var myMixin = {
+        created: function () {
+            this.hello();
+        },
+        methods: {
+            hello: function () {
+                console.log('hello from mixin');
+            }
+        }
+    };
+
+    // 定义一个使用混入对象的组件
+    var Component = Vue.extend({
+        mixins: [myMixin]
+    });
+
+    var component = new Component(); // => "hello from mixin!"
+
+    //1.1 同名钩子函数将混合为一个数组，因此都将被调用。另外，混入对象的钩子将在组件自身钩子之前调用。
+    //1.2 数据对象在内部会进行浅合并 (一层属性深度)，在和组件的数据发生冲突时以组件数据优先。
+    //1.3 值为对象的选项，例如 methods, components 和 directives，将被混合为同一个对象。两个对象键名冲突时，取组件对象的键值对。\
+    var mixin = {
+        data: function () {
+            return {
+                message: 'mixin-message',
+                foo    : 'mixin-foo'
+            }
+        },
+        created: function () {
+            console.log('mixin create function')
+        },
+        methods: {
+            fooM: function () {
+                console.log('from mixin foo methods')
+            },
+            conflictingM: function () {
+                console.log('from mixin conflicting methods')
+            }
+        }
+    };
+
+    // 全局混入
+    // 将会影响到 所有 之后创建的 Vue 实例。使用恰当时，可以为自定义对象注入处理逻辑。
+    // 为自定义的选项 'myOption' 注入一个处理器。
+    // Vue.mixin({
+    //     created: function () {
+    //         var myOption = this.$options.myOption
+    //         if (myOption) {
+    //             console.log(myOption)
+    //         }
+    //     }
+    // });
+
+    //【2】Custom Directives
+    // 除了核心功能默认内置的指令 (v-model 和 v-show)，Vue 也允许注册自定义指令
+
+    //2.1 注册一个全局自定义指令 `v-focus`
+    // 想注册局部指令，组件中也接受一个 directives 的选项：
+    Vue.directive('focus', {
+        // 当被绑定的元素插入到 DOM 中时……
+        inserted: function (el) {
+            el.focus();
+        }
+    });
+
+    //2.2.1 钩子函数
+    // bind
+    // inserted
+    // update
+    // componentUpdated
+    // unbind
+    //2.2.2 钩子函数参数 - 除了 el 之外，其它参数都应该是只读的，切勿进行修改
+    // el
+    // binding
+    //     name：指令名，不包括 v- 前缀。
+    //     value：指令的绑定值，例如：v-my-directive="1 + 1" 中，绑定值为 2。
+    //     oldValue：指令绑定的前一个值，仅在 update 和 componentUpdated 钩子中可用。无论值是否改变都可用。
+    //     expression：字符串形式的指令表达式。例如 v-my-directive="1 + 1" 中，表达式为 "1 + 1"。
+    //     arg：传给指令的参数，可选。例如 v-my-directive:foo 中，参数为 "foo"。
+    //     modifiers：一个包含修饰符的对象。例如：v-my-directive.foo.bar 中，修饰符对象为 { foo: true, bar: true }。
+    // vnode
+    // oldVnode
+    Vue.directive('demo', {
+        bind: function (el, binding, vnode) {
+            var s = JSON.stringify;
+
+            el.innerHTML =
+                'name: '       + s(binding.name) + '<br>' +
+                'value: '      + s(binding.value) + '<br>' +
+                'expression: ' + s(binding.expression) + '<br>' +
+                'argument: '   + s(binding.arg) + '<br>' +
+                'modifiers: '  + s(binding.modifiers) + '<br>' +
+                'vnode keys: ' + Object.keys(vnode).join(', ')
+        }
+    });
+    // 你可能想在 bind 和 update 时触发相同行为，而不关心其它的钩子。比如这样写:
+    Vue.directive('color-swatch', function (el, binding) {
+        el.style.backgroundColor = binding.value
+    });
+
+    //todo：【3】渲染函数 & JSX
+
+    //【4】插件 - 插件通常会为 Vue 添加全局功能。
+    // 添加全局方法或者属性，如: vue-custom-element
+    // 添加全局资源：指令/过滤器/过渡等，如 vue-touch
+    // 通过全局 mixin 方法添加一些组件选项，如: vue-router
+    // 添加 Vue 实例方法，通过把它们添加到 Vue.prototype 上实现。
+    // 一个库，提供自己的 API，同时提供上面提到的一个或多个功能，如 vue-router
+    // MyPlugin.install = function (Vue, options) {
+    //     // 1. 添加全局方法或属性
+    //     Vue.myGlobalMethod = function () {
+    //         // 逻辑...
+    //     };
+    //
+    //     // 2. 添加全局资源
+    //     Vue.directive('my-directive', {
+    //         bind (el, binding, vnode, oldVnode) {
+    //             // 逻辑...
+    //         }
+    //     });
+    //
+    //     // 3. 注入组件
+    //     Vue.mixin({
+    //         created: function () {
+    //             // 逻辑...
+    //         }
+    //     });
+    //
+    //     // 4. 添加实例方法
+    //     Vue.prototype.$myMethod = function (methodOptions) {
+    //         // 逻辑...
+    //     }
+    // };
+
+    // 使用插件
+    // Vue.use 会自动阻止多次注册相同插件，届时只会注册一次该插件。
+    // Vue.use(MyPlugin, { someOption: true }); // 调用 `MyPlugin.install(Vue)
+
+    //【5】过滤器
+    // 双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)
+
+
+    var vm = new Vue({
+        el     : '#reuse',
+        mixins : [mixin],
+        data   : function () {
+            return {
+                message: 'message1',
+                bar    : 'bar'
+            }
+        },
+        created: function () {
+            console.log(this.$data); // => { message: "goodbye", foo: "abc", bar: "def" }
+        },
+        methods: {
+            barM        : function () {
+                console.log('bar methods')
+            },
+            conflictingM: function () {
+                console.log('conflicting methods')
+            }
+        },
+        filters:{
+            capitalize: function (value) {
+                if (!value) return '';
+                value = value.toString();
+                return value.charAt(0).toUpperCase() + value.slice(1);
+            }
+        }
+    });
+
+    vm.fooM(); // => "from mixin foo methods"
+    vm.barM(); // => "bar methods"
+    vm.conflictingM() // => "conflicting methods"
+
+
+</script>
+</body>
+</html>

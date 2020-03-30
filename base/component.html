@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--组件是可复用的 Vue 实例-->
+    <!--与 new Vue 接收相同的选项，例如 data、computed、watch、methods 以及生命周期钩子等。
+    仅有的例外是像 el 这样根实例特有的选项。-->
+    <title>component</title>
+
+    <style>
+        .demo-alert-box {
+            padding: 10px 20px;
+            background: #f3beb8;
+            border: 1px solid #f09898;
+        }
+    </style>
+
+</head>
+
+<body>
+<div id="component-demo">
+    <button-counter></button-counter>
+    <button-counter></button-counter>
+    <button is="button-counter"></button>
+
+    <br>
+    <!--通过 Prop 向子组件传递数据-->
+    <blog-post title="My journey with Vue"></blog-post>
+    <blog-post v-for="post in posts" :key="post.id" :title="post.title"></blog-post>
+    <br>
+
+    <br>
+    <!--通过事件向父级组件发送消息-->
+    <!--调用内建的 $emit 方法并传入事件的名字，来向父级组件触发一个事件-->
+    <div :style="{fontSize: postFontSize + 'em'}"  >
+        <blog-post-ex v-for="post in posts" :key="post.id + '1'" :post="post" @enlarge-text="enlargeText"></blog-post-ex>
+    </div>
+    <br>
+
+    <br>
+    <alert-box>
+        Something bad happened.
+    </alert-box>
+    <br>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script>
+    // 基本示例
+    // 全局注册
+    Vue.component('button-counter', {
+        // 一个组件的 data 选项必须是一个函数
+        data:function () {
+            return {
+                count:0
+            };
+        },
+        template:'<button @click="count++">You Click Me {{count}} times.</button>'
+    });
+
+    // 通过 Prop 向子组件传递数据
+    // 当一个值传递给一个 prop 特性的时候，它就变成了那个组件实例的一个属性。
+    Vue.component('blog-post', {
+        props: ['title'],
+        template: '<h3>{{title}}</h3>'
+    });
+
+    //单个根元素
+    // every component must have a single root element
+    Vue.component('blog-post-ex', {
+        props   : ['post'],
+        // 模板字符串
+        // IE 需要经过(经过 Babel 或 TypeScript 之类的工具) 编译
+        template: `
+<div class="blog-post">
+  <h3>{{post.title}}</h3>
+  <button @click="$emit('enlarge-text', 0.1)">
+        Enlarge text
+  </button>
+  <div v-html="post.content"></div>
+</div>
+        `
+    });
+
+    // 在组件上使用 v-model
+    // 将其 value 特性绑定到一个名叫 value 的 prop 上
+    // 在其 input 事件被触发时，将新的值通过自定义的 input 事件抛出
+    Vue.component('custom-input',{
+        props: ['value'],
+        template:`
+<input :value="value" @input="$emit('input', $event.target.value)">
+        `
+    });
+
+    // 通过插槽分发内容
+    Vue.component('alert-box', {
+        template: `
+    <div class="demo-alert-box">
+      <strong>Error!</strong>
+      <slot></slot>
+    </div>
+  `
+    });
+
+    var vm = new Vue({
+        el   : '#component-demo',
+        data : {
+            posts       : [
+                {id: 1, title: 'Blogging with Vue', content: 'Blogging with Vue'},
+                {id: 2, title: 'Why Vue is so fun', content: 'Blogging with Vue'},
+            ],
+            postFontSize: 1
+        },
+        methods: {
+            enlargeText: function (enlargeAmount) {
+                // 通过 $event 访问到自定义事件被抛出的这个值
+                this.postFontSize = this.postFontSize + enlargeAmount;
+            }
+        }
+    });
+</script>
+</body>
+</html>

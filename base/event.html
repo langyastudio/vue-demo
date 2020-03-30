@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event</title>
+</head>
+
+<body>
+<!--Event-->
+<div id="app">
+    <!--事件处理方法-->
+    <!--用特殊变量 $event 把它传入-->
+    <button @click="greet('Form cannot be submitted yet.', $event)">Greet</button>
+
+    <!--事件修饰符 (修饰符可以串联)-->
+    <!--.stop 阻止单击事件继续传播 (event.stopPropagation())-->
+    <!--.prevent 提交事件不再重载页面 (event.preventDefault())-->
+    <!--.capture 事件捕获模式-->
+    <!--.self 只当在 event.target 是当前元素自身时触发处理函数-->
+    <!--.once 点击事件将只会触发一次-->
+    <!--.passive 对应 addEventListener 中的 passive 选项提供了 .passive 修饰符(.passive 会告诉浏览器你不想阻止事件的默认行为)-->
+    <!-- 只有修饰符 -->
+    <form @submit.prevent></form>
+    <button @click.once="greet('Greet_Once.', $event)">Greet_Once</button>
+
+    <!--按键修饰符-->
+    <!--.enter-->
+    <!--.tab-->
+    <!--.delete (捕获“删除”和“退格”键)-->
+    <!--.esc-->
+    <!--.space-->
+    <!--.up-->
+    <!--.down-->
+    <!--.left-->
+    <!--.right-->
+    <div>
+        <input @keyup.enter="submit">
+    </div>
+
+    <!--系统修饰键-->
+    <!--.ctrl-->
+    <!--.alt-->
+    <!--.shift-->
+    <!--.meta-->
+    <!--注意：在 Mac 系统键盘上，meta 对应 command 键 (⌘)。
+    在 Windows 系统键盘 meta 对应 Windows 徽标键 (⊞)。
+    在 Sun 操作系统键盘上，meta 对应实心宝石键 (◆)。
+    在其他特定键盘上，尤其在 MIT 和 Lisp 机器的键盘、以及其后继产品，比如 Knight 键盘、space-cadet 键盘，meta 被标记为“META”。
+    在 Symbolics 键盘上，meta 被标记为“META”或者“Meta”。-->
+    <button @click.ctrl="greet('Greet_Ctrl.', $event)">Greet_Ctrl</button>
+    <button @keyup.ctrl.67="greet('Ctrl_C.', $event)">Ctrl_C</button>
+
+    <!--exact 修饰符 (精确修饰符)-->
+    <!-- 有且只有 Ctrl 被按下的时候才触发 -->
+    <button @click.ctrl.exact="greet('Greet_Exact.', $event)">Greet_Exact</button>
+
+    <!--鼠标按钮修饰符-->
+    <!--.left-->
+    <!--.right-->
+    <!--.middle-->
+    <button @click.right="greet('Greet_Right.', $event)">Greet_Right</button>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script>
+    var vm = new Vue({
+        el     : '#app',
+        data   : {
+            name: 'Vue.js',
+        },
+        methods: {
+            //`event` 是原生 DOM 事件
+            greet: function (msg, event) {
+                // 现在我们可以访问原生事件对象
+                if (event)
+                    event.preventDefault();
+
+                alert('Hello-' + msg + '!');
+            },
+            submit:function (event) {
+                alert('enter keyboard')
+            }
+        },
+
+    });
+
+</script>
+
+</body>
+</html>
