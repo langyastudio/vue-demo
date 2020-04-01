@@ -1,18 +1,6 @@
 <template>
     <div>
-        <i class="fa fa-bath" aria-hidden="true"></i>
-        <mt-cell-swipe
-            title="标题文字"
-            :right="[
-    {
-      content: 'Delete',
-      style: { background: 'red', color: '#fff' },
-      handler: () => this.$messagebox('delete')
-    },
-    {  content: 'save',
-      style: { background: 'green', color: '#fff' },
-      handler: () => this.$messagebox('save')}
-  ]"></mt-cell-swipe>
+       ss
     </div>
 
 </template>
@@ -30,7 +18,6 @@
         },
 
         created(){
-            console.log(Bowser)
 
 
         },

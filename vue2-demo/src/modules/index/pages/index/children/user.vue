@@ -21,7 +21,6 @@
 <script>
     import headTop from 'index/components/header/header-top'
     import footBootom from 'index/components/footer/footer-bottom'
-    import echartVue from './echart'
     export default {
         computed  : {
             defaultActive: function () {
@@ -31,7 +30,6 @@
         components: {
             headTop,
             footBootom,
-            echartVue
         },
     }
 </script>
