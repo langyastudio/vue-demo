@@ -1,0 +1,25 @@
+// 通用样式文件
+@import "./common/reset.scss";
+@import "./common/mint-ui.scss";
+
+//解决三星手机下拉会自动刷新的问题
+body {
+  overflow    : hidden;
+  line-height : 1.6;
+}
+
+.phone-pre-fix {
+  width : 75px !important;
+}
+
+[type=file] {
+  display : none
+}
+
+.form-tip {
+  color         : #a1a1a1;
+  font-size     : 14px;
+  padding-left  : 10px;
+  margin-bottom : 5px;
+  margin-top    : 16px;
+}

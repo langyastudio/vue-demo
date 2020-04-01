@@ -1,0 +1,27 @@
+#[1]rewrite - 重写URL
+<IfModule mod_rewrite.c>
+  Options +FollowSymlinks
+  RewriteEngine On
+  RewriteCond %{REQUEST_URI} !^/m/
+  RewriteCond %{REQUEST_URI} !^$/
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule "^([^/]*)/?(.*)$" "/index/$1.html"
+  RewriteCond %{REQUEST_URI} !^/m/
+  RewriteCond %{REQUEST_URI} ^/$
+  RewriteRule "^$" "/index/index.html"
+
+  RewriteCond %{REQUEST_URI} ^/m/
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule "^m/([^/]*)/?(.*)$" "/phone/$1.html"
+</IfModule>
+
+#[2]缓存
+<IfModule mod_expires.c>
+    #打开缓存
+    ExpiresActive On
+    #纯文本 缓存1天
+    ExpiresByType text/plain A0
+    ExpiresByType text/html  A0
+</IfModule>
