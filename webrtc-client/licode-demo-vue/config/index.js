@@ -1,21 +1,20 @@
-'use strict'
+'use strict';
 // Template version: 1.3.1
 // see http://vuejs-templates.github.io/webpack for documentation.
 
-const path = require('path')
+const path = require('path');
 
 module.exports = {
     dev: {
-
         // Paths
         assetsSubDirectory: 'static',
         assetsPublicPath  : '/',
         proxyTable        : {},
 
         // Various Dev Server settings
-        host           : '192.168.123.90',
-        port           : 8004,
-        //-hacfin
+        host: '192.168.123.100',
+        port: 3001,
+
         autoOpenBrowser: true,// 是否自动打开浏览器
         errorOverlay   : true,// 浏览器错误提示遮罩层
         notifyOnErrors : true,// 编译错误的时候通知提示，需要friendly-errors-webpack-plugin 配合
@@ -76,4 +75,4 @@ module.exports = {
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report
     }
-}
+};

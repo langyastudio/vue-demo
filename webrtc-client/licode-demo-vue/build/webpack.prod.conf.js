@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const path                 = require('path');//获取路径的方法
 const utils                = require('./utils');//公用方法
@@ -12,7 +12,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSPlugin    = require('optimize-css-assets-webpack-plugin');//CSS去重工具
 const UglifyJsPlugin       = require('uglifyjs-webpack-plugin');
 const ImageminPlugin       = require('imagemin-webpack-plugin').default;//图片压缩工具
-const imageminMozjpeg      = require('imagemin-mozjpeg');//jpg压缩工具
+//const imageminMozjpeg      = require('imagemin-mozjpeg');//jpg压缩工具
 
 
 //定义环境变量
@@ -33,14 +33,14 @@ const webpackConfig = merge(baseWebpackConfig, {
 
     },
     optimization: {
-        minimize   : true, //是否进行代码压缩
-        splitChunks: {
-            maxAsyncRequests: Infinity,
+        minimize    : true, //是否进行代码压缩
+        splitChunks : {
+            maxAsyncRequests  : Infinity,
             maxInitialRequests: Infinity,
-            cacheGroups: {
+            cacheGroups       : {
                 default: false,
                 //【1】提取（api/config/script）配置
-                env: {
+                env    : {
                     chunks  : function (chunk) {
                         return chunk.name != 'common/config'
                     },
@@ -55,7 +55,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                     test    : /[\\/]src[\\/](router|store)[\\/]index[\\.]js/,
                     priority: 29,
                     name    : 'index/entry-com',
-                    enforce  : true,
+                    enforce : true,
                 },
 
                 //【3】提取Mobile端入口（/router/store）配置
@@ -64,7 +64,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                     test    : /[\\/]src[\\/](router|store)[\\/]phone[\\.]js/,
                     priority: 28,
                     name    : 'phone/entry-com',
-                    enforce  : true,
+                    enforce : true,
                 },
 
                 //【4】PC端提取node_module
@@ -95,11 +95,11 @@ const webpackConfig = merge(baseWebpackConfig, {
                     test    : (m, c) => {
                         var cname = c.map((cd) => {
                             return cd.name
-                        })
+                        });
                         return m.constructor.name === 'CssModule' && cname.every((s) => {
-                                return s.indexOf('index/') != -1
+                            return s.indexOf('index/') != -1
 
-                            })
+                        })
                     },
                     chunks  : 'initial',
                     enforce : true,
@@ -112,11 +112,11 @@ const webpackConfig = merge(baseWebpackConfig, {
                     test    : (m, c) => {
                         var cname = c.map((cd) => {
                             return cd.name
-                        })
+                        });
                         return m.constructor.name === 'CssModule' && cname.every((s) => {
-                                return s.indexOf('phone/') != -1
+                            return s.indexOf('phone/') != -1
 
-                            })
+                        })
                     },
                     chunks  : 'initial',
                     enforce : true,
@@ -153,7 +153,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 
                 //【10】PC端提取内部组件公共部分
                 indexasynccom: {
-                    chunks  : (chunk) => {
+                    chunks   : (chunk) => {
                         const entrypre = chunk.name.substring(0, chunk.name.lastIndexOf('/'));
                         return entrypre == 'index'
                     },
@@ -165,7 +165,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 
                 //【11】Mobile端提取内部组件公共部分
                 phoneasynccom: {
-                    chunks  : (chunk) => {
+                    chunks   : (chunk) => {
                         const entrypre = chunk.name.substring(0, chunk.name.lastIndexOf('/'));
                         return entrypre == 'phone'
                     },
@@ -174,7 +174,6 @@ const webpackConfig = merge(baseWebpackConfig, {
                     enforce  : true,
                     priority : 20,
                 },
-
 
 
             }
@@ -212,7 +211,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         new MiniCssExtractPlugin({
             filename     : utils.assetsPath('css/[name].[contenthash].css'),
             chunkFilename: utils.assetsPath('css/[name].[contenthash].css'),
-            ignoreOrder: true,
+            ignoreOrder  : true,
         }),
 
         //【4】css去重
@@ -314,10 +313,10 @@ const webpackConfig = merge(baseWebpackConfig, {
                 quality: '75-80'
             },
             plugins : [
-                imageminMozjpeg({
-                    quality    : 80,
-                    progressive: true
-                })
+                // imageminMozjpeg({
+                //     quality    : 80,
+                //     progressive: true
+                // })
             ]
         }),
     ]
@@ -350,20 +349,20 @@ if (config.build.bundleAnalyzerReport) {
 Object.keys(utils.entries()).forEach(function (entry) {
     const entryname = entry.substring(entry.lastIndexOf('/') + 1);
     const entrypre  = entry.substring(0, entry.lastIndexOf('/'));
-    let vendor,entry_com,async_com;
+    let vendor, entry_com, async_com;
     if (entrypre == 'phone') {
-        vendor = 'phone/vendor';
+        vendor    = 'phone/vendor';
         async_com = 'phone/async-com';
         entry_com = 'phone/entry-com'
     } else {
-        vendor = 'index/vendor';
+        vendor    = 'index/vendor';
         async_com = 'index/async-com';
         entry_com = 'index/entry-com'
     }
     var etToZh     = {
         'index': '首页',
         'video': '视频'
-    }
+    };
     var page_title = etToZh[entryname] ? etToZh[entryname] : '';
 
     webpackConfig.plugins.push(
@@ -373,7 +372,7 @@ Object.keys(utils.entries()).forEach(function (entry) {
             template      : 'src/modules/' + entrypre + '/pages/' + entryname + '/' + entryname + '.pug',
             favicon       : 'favicon.ico',
             inject        : true,
-            chunks        : ['common/runtime',vendor,'common/config','common/env',entry_com,async_com,entry],
+            chunks        : ['common/runtime', vendor, 'common/config', 'common/env', entry_com, async_com, entry],
             minify        : {
                 removeComments       : true,
                 collapseWhitespace   : true,

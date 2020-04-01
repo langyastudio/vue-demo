@@ -1,8 +1,9 @@
-'use strict'
-const path            = require('path')
-const utils           = require('./utils')
-const config          = require('../config')
-const vueLoaderConfig = require('./vue-loader.conf')
+'use strict';
+
+const path            = require('path');
+const utils           = require('./utils');
+const config          = require('../config');
+const vueLoaderConfig = require('./vue-loader.conf');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 function resolve(dir) {
@@ -18,11 +19,11 @@ const createLintingRule = () => ({
         formatter  : require('eslint-friendly-formatter'),
         emitWarning: !config.dev.showEslintErrorsInOverlay
     }
-})
+});
 
-var entry = utils.entries()
-entry['common/config'] =  './src/config/config.js'
-module.exports = {
+var entry              = utils.entries();
+entry['common/config'] = './src/config/config.js';
+module.exports         = {
     //hacfin
     entry    : entry,
     output   : {
@@ -54,7 +55,7 @@ module.exports = {
             {
                 test   : /\.js$/,
                 loader : 'babel-loader',
-                include: [resolve('src'), resolve('test'),resolve('node_modules/webpack-dev-server/client')]
+                include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]
             },
             {
                 test   : /\.(png|jpe?g|gif|svg)(\?.*)?$/,
