@@ -7,7 +7,6 @@
 
 <script>
     import {getCourseList, creatCourse, editCourse} from '@/api/getdata'
-    import Bowser from 'bowser'
 
 
     export default {

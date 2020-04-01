@@ -1,7 +1,6 @@
 <template>
     <div class="header_container">
         <div class="logoContain">
-            <img class="logo" src="~static/images/logo.png" alt="">
             <div> 头部</div>
             <ul class="head-nav-list">
                 <li><a href="/">首页</a></li>
