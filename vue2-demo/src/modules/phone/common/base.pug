@@ -1,0 +1,102 @@
+doctype html
+html(lang='en')
+    head
+        title #{htmlWebpackPlugin.options.title}
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+        meta(id="sharethumb" ,property="og:image", content="")
+        meta(name='renderer', content='webkit')
+        meta(name='force-rendering', content='webkit')
+        meta(name='apple-mobile-web-app-status-bar-style')
+        meta(name="description", content="无论是课件视频、音频，还是教案ppt、word、pdf或精美图片，华科飞扬校际资源管理平台都能高效管理、检索、在线浏览、下载资源。华科飞扬校际资源平台-播谷网，可以无缝对接华科飞扬一体化录播系统、录课宝等，结合华科飞扬点播、转码与直播服务平台的多屏多终端、码率自适应播放技术，支持多屏多终端播放。我们可以足不出户，每堂课程尽在掌握之中。")
+        meta(name="keywords", content="华科飞扬,播谷网,VR,点播,直播,互动,多屏融合,多屏多终端播放,视频门户网站模版,资源管理网站模版,直播门户网站模版")
+        meta(http-equiv='Cache-Control', content='no-siteapp')
+        meta(http-equiv='Cache-Control', content='no-transform ')
+        script.
+            window.PointerEvent = undefined
+        block head
+            link(rel="stylesheet" href="/static/iconfont/iconfont.css")
+            link(rel="stylesheet" href="/static/assets/mint-ui-2.2.13/lib/style.min.css")
+    body
+        block content
+            div#app
+
+
+        block scripts
+            script(src="/static/assets/vue-2.6.10/dist/vue.min.js")
+            script(src="/static/assets/axios-0.18.0/dist/axios.min.js")
+            script(src="/static/assets/mint-ui-2.2.13/lib/index.js")
+            script(src="/static/assets/vue-router-3.0.1/dist/vue-router.min.js")
+            script(src="/static/assets/bowser-1.9.3/bowser.min.js")
+            script(src="/static/lib/origin-js/origin-js.js")
+            script.
+                var lastTouchEnd = 0;
+                document.documentElement.addEventListener('touchend', function (event) {//禁用苹果双击页面放大
+                    var now = Date.now();
+                    if (now - lastTouchEnd <= 300) {
+
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                function getUrlRelativePath() {
+                    var url    = document.location.toString();
+                    var arrUrl = url.split("//");
+
+                    var start  = arrUrl[1].indexOf("/");
+                    var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+
+                    if (relUrl.indexOf("?") != -1) {
+                        relUrl = relUrl.split("?")[0];
+                    }
+                    return relUrl;
+                }
+                function getUrlParams() {
+                    var url    = document.location.toString();
+                    var params = '';
+
+                    if (url.indexOf("?") != -1) {
+                        params = url.split("?")[1];
+                    }
+                    return params;
+                }
+                function IsPC() {
+                    var userAgentInfo = navigator.userAgent.toLowerCase();
+                    var Agents        = ["android", "symbianos", "windows phone",
+                        "ipad", "ipod", "iphone", "android", "phone", "mobile",
+                        "wap", "netfront", "java", "opera mobi", "opera mini", "ucweb",
+                        "windows ce", "symbian", "series", "webos", "sony",
+                        "blackberry", "dopod", "nokia", "samsung", "palmsource", "xda",
+                        "pieplus", "meizu", "midp", "cldc", "motorola", "foma",
+                        "docomo", "up.browser", "up.link", "blazer", "helio", "hosin",
+                        "huawei", "novarra", "coolpad", "webos", "techfaith",
+                        "palmsource", "alcatel", "amoi", "ktouch", "nexian",
+                        "ericsson", "philips", "sagem", "wellcom", "bunjalloo", "maui",
+                        "smartphone", "iemobile", "spice", "bird", "zte-", "longcos",
+                        "pantech", "gionee", "portalmmm", "jig browser", "hiptop",
+                        "benq", "haier", "^lct", "320x320", "240x320", "176x220",
+                        "w3c ", "acs-", "alav", "alca", "amoi", "audi", "avan", "benq",
+                        "bird", "blac", "blaz", "brew", "cell", "cldc", "cmd-", "dang",
+                        "doco", "eric", "hipt", "inno", "ipaq", "java", "jigs", "kddi",
+                        "keji", "leno", "lg-c", "lg-d", "lg-g", "lge-", "maui", "maxo",
+                        "midp", "mits", "mmef", "mobi", "mot-", "moto", "mwbp", "nec-",
+                        "newt", "noki", "oper", "palm", "pana", "pant", "phil", "play",
+                        "port", "prox", "qwap", "sage", "sams", "sany", "sch-", "sec-",
+                        "send", "seri", "sgh-", "shar", "sie-", "siem", "smal", "smar",
+                        "sony", "sph-", "symb", "t-mo", "teli", "tim-", /*"tosh",*/ "tsm-",
+                        "upg1", "upsi", "vk-v", "voda", "wap-", "wapa", "wapi", "wapp",
+                        "wapr", "webc", "winw", "winw", "xda", "xda-", "Googlebot-Mobile"];
+                    var flag          = true;
+                    for (var v = 0; v < Agents.length; v++) {
+                        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    return flag;
+                }
+                if (IsPC()) {
+                    location.href = getUrlRelativePath().replace(/\/m/g, '')
+
+                }

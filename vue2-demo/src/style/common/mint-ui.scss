@@ -1,0 +1,287 @@
+// cover some mint-ui styles
+
+.mint-header {
+  background : #fff;
+  .mint-header-title {
+    color       : #000;
+    margin      : 0;
+    height      : 40px;
+    line-height : 40px;
+  }
+  .mint-header-button {
+    color : #26a2ff
+  }
+
+}
+
+.mint-cell:after {
+  content                  : " ";
+  position                 : absolute;
+  left                     : 0;
+  top                      : 0;
+  right                    : 0;
+  height                   : 1px;
+  border-top               : 1px solid #e5e5e5;
+  color                    : #e5e5e5;
+  -webkit-transform-origin : 0 0;
+  transform-origin         : 0 0;
+  -webkit-transform        : scaleY(.5);
+  transform                : scaleY(.5);
+  left                     : 10px;
+  z-index                  : 2;
+}
+
+.mt-msg {
+  padding-top : 36px;
+  text-align  : center;
+  .mt-msg_icon-area {
+    margin-bottom : 30px;
+  }
+  .mt-icon_msg {
+    font-size : 93px;
+  }
+  .mt-icon_msg.mt-icon-warn {
+    color : #f76260;
+  }
+  .mt-icon_msg.mt-icon-success {
+    color : #2697eb;
+  }
+}
+
+.mt-msg__text-area {
+  margin-bottom : 25px;
+  padding       : 0 20px;
+}
+
+.mt-msg__title {
+  margin-bottom : 5px;
+  font-weight   : 400;
+  font-size     : 20px;
+}
+
+.mt-msg__extra-area {
+  margin-bottom : 15px;
+  font-size     : 14px;
+  color         : #999;
+}
+
+.mt-footer {
+  color : #999;
+  a {
+    color : #199ed8;
+  }
+}
+
+.mt-footer, .mt-grid__label {
+  text-align : center;
+  font-size  : 14px;
+}
+
+.mt-footer__links {
+  font-size : 0;
+}
+
+.mt-footer__text {
+  padding   : 0 .34em;
+  font-size : 12px;
+}
+
+.mt-footer__link {
+  display        : inline-block;
+  vertical-align : top;
+  margin         : 0 .62em;
+  position       : relative;
+  font-size      : 14px;
+}
+
+.mt-cells_form .iconexclamationcircle {
+  display   : none;
+  font-size : 23px;
+}
+
+.mint-cell-wrapper.valid-cell-wrapper {
+  padding-right : 0;
+  .mint-cell-ft {
+    width : 106px;
+
+  }
+}
+
+.mt-cell_warn {
+  color : #f44336;
+  .mint-field-state {
+    margin-left : 5px;
+  }
+  .iconexclamationcircle {
+    display : inline-block;
+  }
+}
+
+.mint-cell-value {
+  margin-right  : 5px;
+  min-width     : 0;
+  padding-right : 10px;
+}
+
+.mint-cell-ft {
+  img {
+    width  : 106px;
+    height : 48px;
+  }
+}
+
+.mint-cell-allow-right:after {
+  width  : 10px;
+  height : 10px
+}
+
+.mint-cell-title {
+  i {
+    width          : 24px;
+    font-size      : 24px;
+    vertical-align : middle;
+    margin-right   : 16px
+  }
+}
+
+.mint-field .mint-cell-title {
+  width : 90px;
+}
+
+.mt-media-box {
+  padding  : 15px;
+  position : relative;
+}
+
+a.mt-media-box {
+  color                       : #000;
+  -webkit-tap-highlight-color : rgba(0, 0, 0, 0);
+}
+
+.mt-media-box_appmsg {
+  display             : -webkit-box;
+  display             : -webkit-flex;
+  display             : flex;
+  -webkit-box-align   : center;
+  -webkit-align-items : center;
+  align-items         : center;
+
+}
+
+.mt-media-box_appmsg .mt-media-box__hd {
+  margin-right : .8em;
+  width        : 60px;
+  height       : 60px;
+  line-height  : 60px;
+  text-align   : center;
+}
+
+.mt-media-box_appmsg .mt-media-box__thumb {
+  width          : 100%;
+  max-height     : 100%;
+  vertical-align : top;
+}
+
+.mt-media-box_appmsg .mt-media-box__bd {
+  -webkit-box-flex : 1;
+  -webkit-flex     : 1;
+  flex             : 1;
+  min-width        : 0;
+}
+
+.mt-media-box__title {
+  font-weight   : 400;
+  font-size     : 17px;
+  width         : auto;
+  overflow      : hidden;
+  text-overflow : ellipsis;
+  white-space   : nowrap;
+  word-wrap     : normal;
+  word-wrap     : break-word;
+  word-break    : break-all;
+}
+
+.mt-media-box__desc {
+  color              : #999;
+  font-size          : 13px;
+  overflow           : hidden;
+  text-overflow      : ellipsis;
+  display            : -webkit-box;
+                     /*! autoprefixer: next */
+  -webkit-box-orient : vertical;
+                     /* autoprefixer: on */
+  -webkit-line-clamp : 2;
+  word-break         : break-all;
+  word-wrap          : break-word;
+}
+
+.mt-grid__icon {
+  width      : 28px;
+  height     : 28px;
+  margin     : 0 auto;
+  text-align : center;
+  i {
+    font-size : 26px;
+  }
+}
+
+.mt-grid__label {
+  display       : block;
+  color         : #000;
+  white-space   : nowrap;
+  text-overflow : ellipsis;
+  overflow      : hidden;
+}
+
+.mt-grid__icon + .mt-grid__label {
+  margin-top : 5px;
+}
+
+.mt-footer, .mt-grid__label {
+  text-align : center;
+  font-size  : 14px;
+}
+
+.mt-cell_warn .mintui-field-default {
+  font-size               : 23px !important;
+  display                 : inline-block;
+  font                    : normal normal normal 14px/1 FontAwesome;
+  font-size               : inherit;
+  text-rendering          : auto;
+  -webkit-font-smoothing  : antialiased;
+  -moz-osx-font-smoothing : grayscale;
+  font-family             : FontAwesome !important;
+}
+
+.mt-cell_warn .mintui-field-default:before {
+  content : "\f06a";
+}
+
+//修复安卓-平板 时间不显示的问题
+.mint-datetime .picker-items, .mint-sex-popup .picker {
+  width : 100%;
+}
+
+//修复安卓-平板 退出登陆提示字体模糊的问题
+.mint-msgbox {
+  transform         : translate3d(-50%, -50%, 0);
+  -webkit-transform : translate3d(-50%, -50%, 0);
+}
+
+.mint-header {
+  font-size : 17px;
+}
+
+.mint-header .mint-header-button {
+  font-size : 16px;
+}
+
+@media screen and (min-height : 438px) {
+  .mt-msg__extra-area {
+    position   : fixed;
+    left       : 0;
+    bottom     : 0;
+    width      : 100%;
+    text-align : center;
+  }
+}
