@@ -1,4 +1,4 @@
-import {baseUrl} from './env'
+import {baseUrl,tokenUrl} from './env'
 import axios from 'axios'
 import {IsPC, getCookie,rootPath} from './utils';
 
@@ -98,9 +98,14 @@ function jsonpAdapter(config) {
     });
 };
 
-export default function (url = '', options, type) {
+export default function (url = '', options, type,is_token) {
     //补充为完整url
-    url = baseUrl + url;
+    if(is_token){
+        url = tokenUrl + url;
+    }else{
+        url = baseUrl + url;
+    }
+
 
     //  post 使用data作为参数，get使用params作为参数
     var config;
@@ -111,6 +116,10 @@ export default function (url = '', options, type) {
             data  : options.data,
             withCredentials: true
         }
+        if(is_token){
+            delete config.withCredentials
+        }
+
     } else {
         config = {
             method : type,

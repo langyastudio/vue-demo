@@ -2,6 +2,13 @@ import ajax from '@/config/ajax'
 
 import {baseUrl} from '@/config/env'
 
+
+
+/**
+ * 获取Token
+ */
+export const createToken = data => ajax('/createToken', data, 'POST',true);
+
 /**
  * 获取课程列表
  */
