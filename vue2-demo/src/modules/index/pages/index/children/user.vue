@@ -64,7 +64,6 @@
                 }
             },
             toggleSlideShowMode() {
-                var that = this;
                 const streams      = this.room.remoteStreams;
                 const cb           = (evt) => {
                     console.log('SlideShowMode changed', evt);
@@ -79,7 +78,6 @@
                 });
             },
             startBasicExample(){
-                var that = this
                 document.getElementById('startButton').disabled   = true;
                 document.getElementById('slideShowMode').disabled = false;
                 document.getElementById('startWarning').hidden    = true;
