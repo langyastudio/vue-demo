@@ -49,20 +49,6 @@
                 }
                 this.localStream = Erizo.Stream(config);
 
-                //1.1 本地流显示
-                if (!this.onlySubscribe) {
-                    const div = document.createElement('div');
-                    div.setAttribute('style', 'width: 320px; height: 240px; float:left');
-                    div.setAttribute('id', 'myVideo');
-                    document.getElementById('videoContainer').appendChild(div);
-
-                    //本地流初始化 - 请求摄像头
-                    this.localStream.init();
-                    this.localStream.addEventListener('access-accepted', () => {
-                        this.localStream.show('myVideo');
-                    });
-                }
-
                 //2.0 Room config
                 const roomData = {
                     username          : 'user',
@@ -81,27 +67,28 @@
                         this.room = Erizo.Room({token});
 
                         //2.3 Room Connect
-                        var singlePC = this.singlePC;
-                        this.room.connect({singlePC});
+                        if (this.onlySubscribe) {
+                            var singlePC = this.singlePC;
+                            this.room.connect({singlePC});
+                        }
+                        //1.1 本地流显示
+                        else
+                        {
+                            const div = document.createElement('div');
+                            div.setAttribute('style', 'width: 320px; height: 240px; float:left');
+                            div.setAttribute('id', 'myVideo');
+                            document.getElementById('videoContainer').appendChild(div);
+
+                            //本地流初始化 - 请求摄像头
+                            this.localStream.init();
+                            this.localStream.addEventListener('access-accepted', () => {
+                                var singlePC = this.singlePC;
+                                this.room.connect({singlePC});
+                                this.localStream.show('myVideo');
+                            });
+                        }
 
                         //4.0 监听事件
-                        const subscribeToStreams = (streams) => {
-                            if (this.onlyPublish) {
-                                return;
-                            }
-
-                            streams.forEach((stream) => {
-                                if (this.localStream.getID() !== stream.getID()) {
-                                    var slideShowMode = this.slideShowMode;
-
-                                    this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
-                                    stream.addEventListener('bandwidth-alert', (evt) => {
-                                        console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
-                                    });
-                                }
-                            });
-                        };
-
                         //4.1 教室连接成功
                         this.room.addEventListener('room-connected', (roomEvent) => {
                             const options         = {metadata: {type: 'publisher'}};
@@ -131,9 +118,9 @@
 
                         //4.3 流添加
                         this.room.addEventListener('stream-added', (streamEvent) => {
-                            if (this.localStream) {
-                                this.localStream.setAttributes({type: 'publisher'});
-                            }
+                            // if (this.localStream) {
+                            //     this.localStream.setAttributes({type: 'publisher'});
+                            // }
 
                             const streams = [];
                             streams.push(streamEvent.stream);
@@ -154,6 +141,23 @@
                         this.room.addEventListener('stream-failed', () => {
                             console.log('Stream Failed, act accordingly');
                         });
+
+                        const subscribeToStreams = (streams) => {
+                            if (this.onlyPublish) {
+                                return;
+                            }
+
+                            streams.forEach((stream) => {
+                                if (this.localStream.getID() !== stream.getID()) {
+                                    var slideShowMode = this.slideShowMode;
+
+                                    this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
+                                    stream.addEventListener('bandwidth-alert', (evt) => {
+                                        console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
+                                    });
+                                }
+                            });
+                        };
                     }
                 })
             },
