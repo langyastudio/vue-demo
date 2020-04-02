@@ -131,7 +131,10 @@ export default function (url = '', options, type,is_token) {
 
     //成功的回调
     function success(res) {
-        switch (res.data.code) {
+
+        var status_code = res.data.code || res.status
+
+        switch (status_code) {
             case 200:
                 if (options.callback) {
                     if (typeof (res.data["count"]) != 'undefined') {

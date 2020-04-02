@@ -19,6 +19,7 @@
     import headTop from 'index/components/header/header-top'
     import footBootom from 'index/components/footer/footer-bottom'
     import {getParameterByName} from '@/config/utils'
+    import {createToken} from '@/api/getdata'
     export default {
         data(){
             return {
@@ -109,20 +110,6 @@
                     config.extensionId = 'okeephmleflklcdebijnponpabbmmgeo';
                 }
                 this.localStream       = Erizo.Stream(config);
-                const createToken = (roomData, callback) => {
-                    const req = new XMLHttpRequest();
-                    const url = `${this.serverUrl}createToken/`;
-
-                    req.onreadystatechange = () => {
-                        if (req.readyState === 4) {
-                            callback(req.responseText);
-                        }
-                    };
-
-                    req.open('POST', url, true);
-                    req.setRequestHeader('Content-Type', 'application/json');
-                    req.send(JSON.stringify(roomData));
-                };
 
                 const roomData = {
                     username: 'user',
@@ -132,105 +119,110 @@
                     mediaConfiguration
                 };
 
-                createToken(roomData, (response) => {
-                    var obj     = JSON.parse(response);
-                    const token = obj.token;
-                    console.log(token);
-                    this.room = Erizo.Room({token});
 
-                    const subscribeToStreams = (streams) => {
-                        if (autoSubscribe) {
-                            return;
-                        }
-                        if (onlyPublish) {
-                            return;
-                        }
-                        const cb = (evt) => {
-                            console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
+                createToken({
+                    data:roomData,
+                    callback:(response) => {
+
+                        var obj     = response
+                        const token = obj.token;
+                        console.log(token);
+                        this.room = Erizo.Room({token});
+
+                        const subscribeToStreams = (streams) => {
+                            if (autoSubscribe) {
+                                return;
+                            }
+                            if (onlyPublish) {
+                                return;
+                            }
+                            const cb = (evt) => {
+                                console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
+                            };
+
+
+
+
+                            streams.forEach((stream) => {
+
+
+                                if (this.localStream.getID() !== stream.getID()) {
+                                    var slideShowMode = this.slideShowMode
+
+                                    this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
+                                    stream.addEventListener('bandwidth-alert', cb);
+                                }
+                            });
                         };
 
+                        this.room.addEventListener('room-connected', (roomEvent) => {
+                            const options         = {metadata: {type: 'publisher'}};
+                            const enableSimulcast = getParameterByName('simulcast');
+                            if (enableSimulcast) options.simulcast = {numSpatialLayers: 2};
 
+                            if (!onlySubscribe) {
+                                this.room.publish(this.localStream, options);
+                            }
+                            if (autoSubscribe) {
+                                this.room.autoSubscribe({'/attributes/type': 'publisher'}, {}, {
+                                    audio: true,
+                                    video: true,
+                                    data : false
+                                }, () => {
+                                });
+                            }
+                            subscribeToStreams(roomEvent.streams);
+                        });
 
+                        this.room.addEventListener('stream-subscribed', (streamEvent) => {
+                            const stream = streamEvent.stream;
+                            const div    = document.createElement('div');
+                            div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
+                            div.setAttribute('id', `test${stream.getID()}`);
 
-                        streams.forEach((stream) => {
+                            document.getElementById('videoContainer').appendChild(div);
+                            stream.show(`test${stream.getID()}`);
+                        });
 
+                        this.room.addEventListener('stream-added', (streamEvent) => {
+                            const streams = [];
+                            streams.push(streamEvent.stream);
+                            if (this.localStream) {
+                                this.localStream.setAttributes({type: 'publisher'});
+                            }
+                            subscribeToStreams(streams);
+                            document.getElementById('recordButton').disabled = false;
+                        });
 
-                            if (this.localStream.getID() !== stream.getID()) {
-                                var slideShowMode = this.slideShowMode
-
-                                this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
-                                stream.addEventListener('bandwidth-alert', cb);
+                        this.room.addEventListener('stream-removed', (streamEvent) => {
+                            // Remove stream from DOM
+                            const stream = streamEvent.stream;
+                            if (stream.elementID !== undefined) {
+                                const element = document.getElementById(stream.elementID);
+                                document.getElementById('videoContainer').removeChild(element);
                             }
                         });
-                    };
 
-                    this.room.addEventListener('room-connected', (roomEvent) => {
-                        const options         = {metadata: {type: 'publisher'}};
-                        const enableSimulcast = getParameterByName('simulcast');
-                        if (enableSimulcast) options.simulcast = {numSpatialLayers: 2};
-
-                        if (!onlySubscribe) {
-                            this.room.publish(this.localStream, options);
-                        }
-                        if (autoSubscribe) {
-                            this.room.autoSubscribe({'/attributes/type': 'publisher'}, {}, {
-                                audio: true,
-                                video: true,
-                                data : false
-                            }, () => {
-                            });
-                        }
-                        subscribeToStreams(roomEvent.streams);
-                    });
-
-                    this.room.addEventListener('stream-subscribed', (streamEvent) => {
-                        const stream = streamEvent.stream;
-                        const div    = document.createElement('div');
-                        div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
-                        div.setAttribute('id', `test${stream.getID()}`);
-
-                        document.getElementById('videoContainer').appendChild(div);
-                        stream.show(`test${stream.getID()}`);
-                    });
-
-                    this.room.addEventListener('stream-added', (streamEvent) => {
-                        const streams = [];
-                        streams.push(streamEvent.stream);
-                        if (this.localStream) {
-                            this.localStream.setAttributes({type: 'publisher'});
-                        }
-                        subscribeToStreams(streams);
-                        document.getElementById('recordButton').disabled = false;
-                    });
-
-                    this.room.addEventListener('stream-removed', (streamEvent) => {
-                        // Remove stream from DOM
-                        const stream = streamEvent.stream;
-                        if (stream.elementID !== undefined) {
-                            const element = document.getElementById(stream.elementID);
-                            document.getElementById('videoContainer').removeChild(element);
-                        }
-                    });
-
-                    this.room.addEventListener('stream-failed', () => {
-                        console.log('Stream Failed, act accordingly');
-                    });
-
-                    if (onlySubscribe) {
-                        this.room.connect({singlePC});
-                    } else {
-                        const div = document.createElement('div');
-                        div.setAttribute('style', 'width: 320px; height: 240px; float:left');
-                        div.setAttribute('id', 'myVideo');
-                        document.getElementById('videoContainer').appendChild(div);
-
-                        this.localStream.addEventListener('access-accepted', () => {
-                            this.room.connect({singlePC});
-                            this.localStream.show('myVideo');
+                        this.room.addEventListener('stream-failed', () => {
+                            console.log('Stream Failed, act accordingly');
                         });
-                        this.localStream.init();
+
+                        if (onlySubscribe) {
+                            this.room.connect({singlePC});
+                        } else {
+                            const div = document.createElement('div');
+                            div.setAttribute('style', 'width: 320px; height: 240px; float:left');
+                            div.setAttribute('id', 'myVideo');
+                            document.getElementById('videoContainer').appendChild(div);
+
+                            this.localStream.addEventListener('access-accepted', () => {
+                                this.room.connect({singlePC});
+                                this.localStream.show('myVideo');
+                            });
+                            this.localStream.init();
+                        }
                     }
-                });
+                })
             },
             testConnection(){
 
