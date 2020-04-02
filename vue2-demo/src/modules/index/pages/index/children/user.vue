@@ -27,7 +27,7 @@
                 room         : '',
                 recording    : '',
                 recordingId  : '',
-                slideShowMode: ''
+                slideShowMode: false
             }
         },
         computed  : {
@@ -73,6 +73,7 @@
                 streams.forEach((stream) => {
                     if (this.localStream.getID() !== stream.getID()) {
                         console.log('Updating config');
+                        var slideShowMode = this.slideShowMode
                         stream.updateConfiguration({slideShowMode}, cb);
                     }
                 });
@@ -151,8 +152,14 @@
                         };
 
 
+
+
                         streams.forEach((stream) => {
+
+
                             if (this.localStream.getID() !== stream.getID()) {
+                                var slideShowMode = this.slideShowMode
+
                                 this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
                                 stream.addEventListener('bandwidth-alert', cb);
                             }
