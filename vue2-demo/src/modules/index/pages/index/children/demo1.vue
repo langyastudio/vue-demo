@@ -211,11 +211,6 @@
 
 
 <style lang="scss" scoped rel="stylesheet/scss">
-    .container {
-        width      : 1170px;
-        margin     : 0 auto;
-        min-height : 900px;
-    }
 
 
 </style>
