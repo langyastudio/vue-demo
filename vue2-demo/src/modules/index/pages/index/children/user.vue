@@ -2,12 +2,6 @@
     <div>
         <head-top></head-top>
         <el-row class="container">
-
-            <button id="startButton" @click="startBasicExample" disabled>Start</button>
-            <button id="testConnection" @click="testConnection">Test Connection</button>
-            <button id="recordButton" @click="startRecording" disabled>Toggle Recording</button>
-            <button id="slideShowMode" @click="toggleSlideShowMode" disabled>Toggle Slide Show Mode</button>
-            <h1 id="startWarning">Press the start buttong to start receiving streams</h1>
             <div id="videoContainer"></div>
 
         </el-row>
@@ -79,10 +73,6 @@
                 });
             },
             startBasicExample(){
-                document.getElementById('startButton').disabled   = true;
-                document.getElementById('slideShowMode').disabled = false;
-                document.getElementById('startWarning').hidden    = true;
-                document.getElementById('startButton').hidden     = true;
                 this.recording                                         = false;
                 const screen                                      = getParameterByName('screen');
                 const roomName                                    = getParameterByName('room') || 'basicExampleRoom';
