@@ -1,14 +1,9 @@
 import Vue from 'vue'
 import {routerMode} from '@/config/env'
 import Router from 'vue-router'
-
 Vue.use(Router);
-
 const index_user          = r => require.ensure([], () => r(require('index/pages/index/children/user')), 'index/index-main');
-const index_setbindsns    = r => require.ensure([], () => r(require('index/pages/index/children/setbindsns')), 'index/index-main');
 const noexsit             = r => require.ensure([], () => r(require('index/pages/noexsit/children/noexsit')), 'index/no-exsit');
-const admin                = r => require.ensure([], () => r(require('index/pages/admin/children/admin')), 'index/admin-main');
-const adm_visitor          = r => require.ensure([], () => r(require('index/pages/admin/children/adm-visitor')), 'index/admin-main');
 const routes = [
     {
         path     : '/',
@@ -20,21 +15,6 @@ const routes = [
         path     : '/index',
         component: index_user,
         name     : '',
-        children : [ {
-            path     : '/index/setbindsns',
-            component: index_setbindsns,
-            meta     : [],
-        }]
-    },
-    {
-        path     : '/admin',
-        component: admin,
-        name     : '',
-        children : [{
-            path     : '/admin/visitor',
-            component: adm_visitor,
-            meta     : ['站点管理', '访问控制'],
-        }]
     },
     {
         path     : '*',

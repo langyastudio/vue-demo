@@ -2,17 +2,7 @@
     <div>
         <head-top></head-top>
         <el-row class="container">
-            <el-col :span="6" style=" background-color: #fff;">
-                <el-menu :default-active="defaultActive" router>
-                    <el-menu-item index="/"><i class="el-icon-menu"></i><span>用户信息</span></el-menu-item>
-                    <el-menu-item index="/index/setbindsns"><i class="el-icon-menu"></i><span>账号绑定</span></el-menu-item>
-                </el-menu>
-            </el-col>
-            <el-col :span="18">
-                <keep-alive>
-                    <router-view></router-view>
-                </keep-alive>
-            </el-col>
+
         </el-row>
         <foot-bootom></foot-bootom>
     </div>

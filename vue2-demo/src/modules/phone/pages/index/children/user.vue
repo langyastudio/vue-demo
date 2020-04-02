@@ -2,7 +2,7 @@
     <div>
         <head-top></head-top>
         <div class="container">
-            <router-view></router-view>
+
         </div>
         <foot-bootom></foot-bootom>
     </div>

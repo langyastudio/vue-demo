@@ -4,12 +4,6 @@
             <div> 头部</div>
             <ul class="head-nav-list">
                 <li><a href="/">首页</a></li>
-                <li><a href="/video">视频</a></li>
-                <li><a href="/audio">音频</a></li>
-                <li><a href="/upload">上传</a></li>
-                <li><a href="/valaditor">表单验证</a></li>
-                <li><a href="/editor">Editor</a></li>
-                <li><a href="/admin/visitor">后台管理</a></li>
             </ul>
         </div>
 
@@ -17,13 +11,12 @@
 </template>
 
 <script>
-    import {setCookie, removeCookie} from '@/config/utils';
     export default {
         data(){
             return {}
         },
         created(){
-            setCookie("MazeCloud", "f023516f02cfe15986daceda2b1152e1")
+
 
         },
         computed: {},

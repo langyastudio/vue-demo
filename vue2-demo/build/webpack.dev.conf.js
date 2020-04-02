@@ -30,7 +30,6 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             rewrites: [
                 {from: /^\/m\/index(\/.*)*$/, to: '/phone/index.html'},
                 {from: /^\/m\/noexsit$/, to: '/phone/noexsit.html'},
-                { from: /^\/admin(\/.*)*$/, to: '/index/admin.html' },
             ]
         },
         // hot               : true,//热替换
