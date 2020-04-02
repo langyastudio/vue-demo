@@ -2,7 +2,7 @@
     <div class="header_container">
         <div class="logoContain">
             <ul class="head-nav-list">
-                <li><a href="/">首页</a></li>
+                <li>头部</li>
             </ul>
         </div>
 
