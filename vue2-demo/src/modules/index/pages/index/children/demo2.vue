@@ -126,11 +126,11 @@
 
                             const div    = document.createElement('div');
                             div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
-                            div.setAttribute('id', `${stream.getID()}`);
+                            div.setAttribute('id', `test${stream.getID()}`);
 
                             document.getElementById('videoContainer').appendChild(div);
 
-                            stream.show(`${stream.getID()}`);
+                            stream.show(`test${stream.getID()}`);
                         });
 
                         //4.3 流添加
