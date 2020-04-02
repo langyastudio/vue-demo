@@ -3376,7 +3376,7 @@ const Bar = (spec) => {
                                   'position: absolute; top: 0; left: 2px;');
   that.logo.setAttribute('class', 'licode_logo');
   that.logo.setAttribute('alt', 'Lynckia');
-  that.logo.setAttribute('src', `${that.url}/assets/star.svg`);
+  that.logo.setAttribute('src', `${that.url}/static/svg/star.svg`);
 
   // Private functions
   const show = (displaying) => {
@@ -7576,7 +7576,7 @@ const VideoPlayer = (spec) => {
                                         'top: 50%; left: 50%; margin-top: -8px; margin-left: -8px');
     that.loader.setAttribute('id', `back_${that.id}`);
     that.loader.setAttribute('class', 'licode_loader');
-    that.loader.setAttribute('src', `${that.url}/assets/loader.gif`);
+    that.loader.setAttribute('src', `${that.url}/static/svg/loader.gif`);
   }
 
   // Video tag
@@ -7663,7 +7663,7 @@ const Speaker = (spec) => {
 
   const mute = () => {
     that.media.muted = true;
-    that.icon.setAttribute('src', `${that.url}/assets/mute48.png`);
+    that.icon.setAttribute('src', `${that.url}/static/svg/mute48.png`);
     if (that.stream.local) {
       that.stream.stream.getAudioTracks()[0].enabled = false;
     } else {
@@ -7675,7 +7675,7 @@ const Speaker = (spec) => {
 
   const unmute = () => {
     that.media.muted = false;
-    that.icon.setAttribute('src', `${that.url}/assets/sound48.png`);
+    that.icon.setAttribute('src', `${that.url}/static/svg/sound48.png`);
     if (that.stream.local) {
       that.stream.stream.getAudioTracks()[0].enabled = true;
     } else {
@@ -7706,7 +7706,7 @@ const Speaker = (spec) => {
   // Volume icon
   that.icon = document.createElement('img');
   that.icon.setAttribute('id', `volume_${that.id}`);
-  that.icon.setAttribute('src', `${that.url}/assets/sound48.png`);
+  that.icon.setAttribute('src', `${that.url}/static/svg/sound48.png`);
   that.icon.setAttribute('style', 'width: 80%; height: 100%; position: absolute;');
   that.div.appendChild(that.icon);
 
@@ -7736,10 +7736,10 @@ const Speaker = (spec) => {
     that.picker.oninput = () => {
       if (that.picker.value > 0) {
         that.media.muted = false;
-        that.icon.setAttribute('src', `${that.url}/assets/sound48.png`);
+        that.icon.setAttribute('src', `${that.url}/static/svg/sound48.png`);
       } else {
         that.media.muted = true;
-        that.icon.setAttribute('src', `${that.url}/assets/mute48.png`);
+        that.icon.setAttribute('src', `${that.url}/static/svg/mute48.png`);
       }
       that.media.volume = that.picker.value / 100;
     };
