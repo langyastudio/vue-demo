@@ -1,6 +1,6 @@
-import {baseUrl,tokenUrl} from './env'
+import {baseUrl, tokenUrl} from './env'
 import axios from 'axios'
-import {IsPC, getCookie,rootPath} from './utils';
+import {IsPC, getCookie, rootPath} from './utils';
 
 if (IsPC()) {
     var Message = require('element-ui').Message
@@ -63,9 +63,9 @@ function jsonpAdapter(config) {
         };
 
         src += (src.indexOf('?') >= 0 ? '&' : '?') + buildParams({
-                callback: jsonp,
-                _       : (new Date().getTime())
-            });
+            callback: jsonp,
+            _       : (new Date().getTime())
+        });
 
         script.onload = script.onreadystatechange = function () {
 
@@ -98,25 +98,24 @@ function jsonpAdapter(config) {
     });
 };
 
-export default function (url = '', options, type,is_token) {
+export default function (url = '', options, type, is_token) {
     //补充为完整url
-    if(is_token){
+    if (is_token) {
         url = tokenUrl + url;
-    }else{
+    } else {
         url = baseUrl + url;
     }
-
 
     //  post 使用data作为参数，get使用params作为参数
     var config;
     if (type == 'POST') {
         config = {
-            method: type,
-            url   : url,
-            data  : options.data,
+            method         : type,
+            url            : url,
+            data           : options.data,
             withCredentials: true
         }
-        if(is_token){
+        if (is_token) {
             delete config.withCredentials
         }
 
@@ -166,7 +165,7 @@ export default function (url = '', options, type,is_token) {
                     } else {
                         // location.href = '/m/passport/login';
                     }
-                },2000)
+                }, 2000)
                 break;
             case 403://缺少令牌
             case 461://令牌无效
@@ -192,7 +191,7 @@ export default function (url = '', options, type,is_token) {
                     } else {
                         // location.href = '/m/passport/login';
                     }
-                },2000)
+                }, 2000)
 
                 break;
             case 524://系统检测到有攻击行为存在
