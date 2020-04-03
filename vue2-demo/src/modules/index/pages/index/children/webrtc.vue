@@ -12,8 +12,6 @@
                     </el-card>
                 </el-col>
             </el-row>
-            <div id="videoContainer">
-            </div>
         </el-main>
         <el-footer>
             <el-card class="box-card">
