@@ -3,8 +3,8 @@
         <el-main>
             <el-row>
                 <el-col :span="6" v-for="playId in playList">
-                    <el-card>
-                        <div :id="playId" style='width: 300px; height: 220px; float:left'>
+                    <el-card class="card">
+                        <div :id="playId" class="play">
                         </div>
                         <div style="padding: 14px;">
                             <span>好吃的汉堡</span>
@@ -358,6 +358,15 @@
         width: 1170px;
         margin: 0 auto;
         min-height: 900px;
+    }
+
+    .card > .el-card__body{
+        padding: 0 !important;
+    }
+
+    .play{
+        width: 300px;
+        height: 220px;
     }
 
     .text {
