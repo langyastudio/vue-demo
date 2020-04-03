@@ -98,7 +98,7 @@
                                 this.room.connect({singlePC});
 
                                 const div = document.createElement('div');
-                                div.setAttribute('style', 'width: 310px; height: 240px; float:left');
+                                div.setAttribute('style', 'width: 300px; height: 220px; float:left');
                                 div.setAttribute('id', 'myVideo');
                                 document.getElementById('videoContainer').appendChild(div);
 
@@ -263,7 +263,7 @@
                                     ' hasData-' + stream.hasData());
 
                                 const div    = document.createElement('div');
-                                div.setAttribute('style', 'width: 310px; height: 240px;float:left;');
+                                div.setAttribute('style', 'width: 300px; height: 220px;float:left;');
                                 div.setAttribute('id', `test${stream.getID()}`);
 
                                 document.getElementById('videoContainer').appendChild(div);
