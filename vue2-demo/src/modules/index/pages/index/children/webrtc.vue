@@ -119,13 +119,14 @@
                     this.room.connect({singlePC});
 
                     this.playList.push('myVideo');
-
-                    //播放本地流
-                    var options = {
-                        speaker: false,//显示音频条
-                        crop   : true //裁剪视频
-                    };
-                    this.localStream.play('myVideo', options);
+                    this.$nextTick(() => {
+                        //播放本地流
+                        var options = {
+                            speaker: false,//显示音频条
+                            crop   : true //裁剪视频
+                        };
+                        this.localStream.play('myVideo', options);
+                    });
 
                     //此时还无法获取流相关的信息，因为仅仅同意打开设备
                     this.logList.push('local stream Access to webcam and/or microphone accepted');
@@ -207,8 +208,9 @@
                             ' hasData-' + stream.hasData());
 
                         this.playList.push(`test${stream.getID()}`);
-
-                        stream.play(`test${stream.getID()}`);
+                        this.$nextTick(() => {
+                            stream.play(`test${stream.getID()}`);
+                        });
                     }
                 });
 
