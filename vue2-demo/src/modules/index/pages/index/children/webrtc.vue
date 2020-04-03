@@ -1,7 +1,19 @@
 <template>
     <el-container>
         <el-main>
-            <div id="videoContainer"></div>
+            <el-row>
+                <el-col :span="6" v-for="playId in playList">
+                    <el-card>
+                        <div :id="playId" style='width: 300px; height: 220px; float:left'>
+                        </div>
+                        <div style="padding: 14px;">
+                            <span>好吃的汉堡</span>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+            <div id="videoContainer">
+            </div>
         </el-main>
         <el-footer>
             <el-card class="box-card">
@@ -33,7 +45,8 @@
                 singlePC          : true,
                 onlySubscribe     : false,     //仅订阅
                 onlyPublish       : false,     //仅推流
-                logList           : []         //日志列表
+                logList           : [],        //日志列表
+                playList          : []         //播放的流的Id号列表
             }
         },
         computed  : {},
@@ -105,10 +118,7 @@
                     var singlePC = this.singlePC;
                     this.room.connect({singlePC});
 
-                    const div = document.createElement('div');
-                    div.setAttribute('style', 'width: 300px; height: 220px; float:left');
-                    div.setAttribute('id', 'myVideo');
-                    document.getElementById('videoContainer').appendChild(div);
+                    this.playList.push('myVideo');
 
                     //播放本地流
                     var options = {
@@ -180,8 +190,10 @@
                     // Remove stream from DOM
                     const stream = streamEvent.stream;
                     if (stream.elementID !== undefined) {
-                        const element = document.getElementById(stream.elementID);
-                        document.getElementById('videoContainer').removeChild(element);
+                        var index = this.playList.indexOf(stream.elementID);
+                        if (index > -1) {
+                            this.playList.splice(index, 1);
+                        }
                     }
                 });
 
@@ -194,11 +206,7 @@
                             ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
                             ' hasData-' + stream.hasData());
 
-                        const div = document.createElement('div');
-                        div.setAttribute('style', 'width: 300px; height: 220px;float:left;');
-                        div.setAttribute('id', `test${stream.getID()}`);
-
-                        document.getElementById('videoContainer').appendChild(div);
+                        this.playList.push(`test${stream.getID()}`);
 
                         stream.play(`test${stream.getID()}`);
                     }
@@ -356,5 +364,12 @@
 
     .item {
         padding: 8px 0;
+    }
+
+    .image {
+        width: 300px;
+        height: 220px;
+        float: left;
+        display: block;
     }
 </style>
