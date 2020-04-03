@@ -5,7 +5,7 @@
         </el-main>
         <el-footer>
             <el-card class="box-card">
-                <div v-for="log in logList"  class="text item">
+                <div v-for="log in logList" class="text item">
                     {{log}}
                 </div>
             </el-card>
@@ -64,8 +64,7 @@
                             this.room.connect({singlePC});
                         }
                         //2.2 本地流显示
-                        else
-                        {
+                        else {
                             this.localStreamInit();
                         }
 
@@ -77,12 +76,12 @@
                     }
                 })
             },
-            localStreamInit(){
+            localStreamInit() {
                 const config = {
                     data          : true,
                     audio         : true,
                     video         : !this.audioOnly,
-                    attributes    : {username:'用户名' + Math.random()},
+                    attributes    : {username: '用户名' + Math.random()},
                     videoSize     : [320, 240, 720, 576], //[minWidth, minHeight, maxWidth, maxHeight]
                     videoFrameRate: [10, 30],
                     screen        : this.screen,
@@ -119,14 +118,13 @@
                     this.localStream.play('myVideo', options);
 
                     //此时还无法获取流相关的信息，因为仅仅同意打开设备
-                    this.logList.push('local stream Access to webcam and/or microphone accepted' );
+                    this.logList.push('local stream Access to webcam and/or microphone accepted');
                 });
                 this.localStream.addEventListener('access-denied', (event) => {
-                    this.logList.push('local stream Access to webcam and/or microphone rejected' );
+                    this.logList.push('local stream Access to webcam and/or microphone rejected');
                 });
             },
-            roomInit()
-            {
+            roomInit() {
                 //----------------------------------------------------------------------------------------------
                 // Room Event
                 // {type:"room-connected", streams:[stream1, stream2]}
@@ -143,10 +141,10 @@
                     //订阅room中已有流
                     this.subscribeToStreams(roomEvent.streams);
                 });
-                this.room.addEventListener("room-error", (evt)=>{
+                this.room.addEventListener("room-error", (evt) => {
 
                 });
-                this.room.addEventListener("room-disconnected", (evt)=>{
+                this.room.addEventListener("room-disconnected", (evt) => {
 
                 });
                 //this.room..disconnect();
@@ -177,7 +175,7 @@
                 // });
                 //a previous available stream has been removed from the room.
                 this.room.addEventListener('stream-removed', (streamEvent) => {
-                    this.logList.push("stream-removed " + this.localStream.getID() );
+                    this.logList.push("stream-removed " + this.localStream.getID());
 
                     // Remove stream from DOM
                     const stream = streamEvent.stream;
@@ -191,13 +189,12 @@
                 this.room.addEventListener('stream-subscribed', (streamEvent) => {
                     const stream = streamEvent.stream;
 
-                    if(stream.getID() !== this.localStream.getID())
-                    {
+                    if (stream.getID() !== this.localStream.getID()) {
                         this.logList.push('stream-subscribed-' + stream.getID() +
                             ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
                             ' hasData-' + stream.hasData());
 
-                        const div    = document.createElement('div');
+                        const div = document.createElement('div');
                         div.setAttribute('style', 'width: 300px; height: 220px;float:left;');
                         div.setAttribute('id', `test${stream.getID()}`);
 
@@ -221,63 +218,62 @@
                     this.logList.push('stream-ended');
                 });
             },
-            subscribeToStreams(streams){
+            subscribeToStreams(streams) {
 
-                    if (this.onlyPublish) {
-                        return;
+                if (this.onlyPublish) {
+                    return;
+                }
+
+                streams.forEach((stream) => {
+                    if (this.localStream && this.localStream.getID() !== stream.getID()) {
+
+                        //可以订阅流中的部分数据
+                        var options = {
+                            audio        : true,
+                            video        : true,
+                            //maxVideoBW: 300, //Kbps
+                            //Simulcast
+                            slideShowMode: this.slideShowMode,
+                            //height: {max: 480}, width: {max: 640},
+                            //frameRate: {max:20},
+                            metadata     : {type: 'subscriber'}
+                        };
+                        this.room.subscribe(stream, options, (result, error) => {
+                            if (result === undefined) {
+                                this.logList.push("Error subscribing to stream " + error);
+                            } else {
+                                this.logList.push("Stream subscribed!");
+                            }
+                        });
                     }
 
-                    streams.forEach((stream) => {
-                        if (this.localStream && this.localStream.getID() !== stream.getID()) {
-
-                            //可以订阅流中的部分数据
-                            var options = {
-                                audio     : true,
-                                video     : true,
-                                //maxVideoBW: 300, //Kbps
-                                //Simulcast
-                                slideShowMode: this.slideShowMode,
-                                //height: {max: 480}, width: {max: 640},
-                                //frameRate: {max:20},
-                                metadata  : {type: 'subscriber'}
-                            };
-                            this.room.subscribe(stream, options, (result, error) => {
-                                if (result === undefined){
-                                    this.logList.push("Error subscribing to stream " + error);
-                                } else {
-                                    this.logList.push("Stream subscribed!");
-                                }
-                            });
-                        }
-
-                        //----------------------------------------------------------------------------------------------
-                        // Stream Event
-                        // access-accepted, access-denied, stream-data, stream-attributes-update and bandwidth-alert
-                        //----------------------------------------------------------------------------------------------
-                        // a subscriber stream is reporting less than the minVideoBW specified in the publisher
-                        stream.addEventListener('bandwidth-alert', (evt) => {
-                            //evt.stream is the problematic subscribe stream.
-                            //evt.bandwidth is the available bandwidth reported by that stream.
-                            //evt.msg the status of that stream, depends on the adaptation scheme.
-                            this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
-                        });
-
-                        //流属性更新
-                        //notifies when the owner of the given stream updates its attributes
-                        stream.addEventListener("stream-attributes-update", (evt) => {
-                            var stream = evt.stream;
-                            this.logList.push('stream-attributes-update ' +  stream.getID() +  evt.msg);
-
-                            //var attributes = stream.getAttributes();
-                            //or var attributes = stream.setAttributes({name: 'myStreamUpdated', type: 'private'});
-                        });
+                    //----------------------------------------------------------------------------------------------
+                    // Stream Event
+                    // access-accepted, access-denied, stream-data, stream-attributes-update and bandwidth-alert
+                    //----------------------------------------------------------------------------------------------
+                    // a subscriber stream is reporting less than the minVideoBW specified in the publisher
+                    stream.addEventListener('bandwidth-alert', (evt) => {
+                        //evt.stream is the problematic subscribe stream.
+                        //evt.bandwidth is the available bandwidth reported by that stream.
+                        //evt.msg the status of that stream, depends on the adaptation scheme.
+                        this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
                     });
+
+                    //流属性更新
+                    //notifies when the owner of the given stream updates its attributes
+                    stream.addEventListener("stream-attributes-update", (evt) => {
+                        var stream = evt.stream;
+                        this.logList.push('stream-attributes-update ' + stream.getID() + evt.msg);
+
+                        //var attributes = stream.getAttributes();
+                        //or var attributes = stream.setAttributes({name: 'myStreamUpdated', type: 'private'});
+                    });
+                });
             },
-            localStreamPublish()
-            {
+            localStreamPublish() {
                 //开始推送本地流
                 const options = {
-                    metadata      : {type: 'publisher'},
+                    metadata: {type: 'publisher'},
                     //minVideoBW: 300,
                     //scheme:"notify-break" //Same as notify-break but Licode will periodically try to recover the subscriber's video.
 
@@ -291,14 +287,13 @@
                 }
 
                 this.room.publish(this.localStream, options, (id, error) => {
-                    if (id === undefined){
+                    if (id === undefined) {
                         this.logList.push("Error publishing stream " + error);
                     }
                 });
             },
             //静音
-            muteAudio(stream, isMuted=true)
-            {
+            muteAudio(stream, isMuted = true) {
                 //in the publisher's side, will stop sending audio/video data to all its subscribers
                 stream.muteAudio(isMuted, function (result) {
                     if (result === 'error') {
@@ -307,27 +302,22 @@
                 });
             },
             //停止本地流
-            stopLocalStream()
-            {
-                if(this.localStream)
-                {
+            stopLocalStream() {
+                if (this.localStream) {
                     this.localStream.stop();
                 }
             },
             //关闭本地流
-            closeLocalStream()
-            {
-                if(this.localStream)
-                {
+            closeLocalStream() {
+                if (this.localStream) {
                     this.localStream.close();
                 }
             },
-            updateConfig(stream)
-            {
+            updateConfig(stream) {
                 var config = {maxVideoBW: 300, maxAudioBW: 300};
 
                 //本地流
-                stream.updateConfiguration(config, function(result) {
+                stream.updateConfiguration(config, function (result) {
                     console.log(result);
                 });
                 //limiting the lower layer to 80 Kbps and the higher to 480 Kbps.
@@ -344,7 +334,7 @@
                     if (this.localStream.getID() !== stream.getID()) {
                         var slideShowMode = this.slideShowMode;
                         stream.updateConfiguration({slideShowMode}, (evt) => {
-                            this.logList.push('SlideShowMode changed ' +  evt);
+                            this.logList.push('SlideShowMode changed ' + evt);
                         });
                     }
                 });
@@ -359,6 +349,7 @@
         margin: 0 auto;
         min-height: 900px;
     }
+
     .text {
         font-size: 14px;
     }

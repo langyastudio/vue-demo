@@ -1,24 +1,21 @@
 import Vue from 'vue'
 import {routerMode} from '@/config/env'
 import Router from 'vue-router'
-Vue.use(Router);
-const index_demo          = r => require.ensure([], () => r(require('index/pages/index/children/user')), 'index/index-main');
-const index_demo_1          = r => require.ensure([], () => r(require('index/pages/index/children/demo1')), 'index/index-main');
-const index_demo_2          = r => require.ensure([], () => r(require('index/pages/index/children/demo2')), 'index/index-main');
 
-const noexsit             = r => require.ensure([], () => r(require('index/pages/noexsit/children/noexsit')), 'index/no-exsit');
+Vue.use(Router);
+
+const index   = r => require.ensure([], () => r(require('index/pages/index/children/index')), 'index/index-main');
+const webrtc  = r => require.ensure([], () => r(require('index/pages/index/children/webrtc')), 'index/index-main');
+const noexsit = r => require.ensure([], () => r(require('index/pages/noexsit/children/noexsit')), 'index/no-exsit');
+
 const routes = [
     {
         path     : '/',
-        component: index_demo,
+        component: index,
         name     : '',
-        children:[{
+        children : [{
             path     : '',
-            component: index_demo_1,
-            meta     : [],
-        },{
-            path     : '/index/demo2',
-            component: index_demo_2,
+            component: webrtc,
             meta     : [],
         }],
         meta     : {scrollToTop: true}
