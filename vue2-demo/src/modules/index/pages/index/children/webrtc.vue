@@ -360,7 +360,7 @@
         min-height: 900px;
     }
 
-    .card > .el-card__body{
+    /deep/ .card > .el-card__body{
         padding: 0 !important;
     }
 
