@@ -91,6 +91,7 @@
                         {
                             //本地流初始化 - 请求摄像头
                             this.localStream.init();
+                            //indicates that the user has accepted to share his camera and microphone.
                             this.localStream.addEventListener('access-accepted', (event) => {
                                 var singlePC = this.singlePC;
                                 this.room.connect({singlePC});
@@ -146,11 +147,16 @@
                                         }
                                     });
 
+                                    // a subscriber stream is reporting less than the minVideoBW specified in the publisher
                                     stream.addEventListener('bandwidth-alert', (evt) => {
+                                        //evt.stream is the problematic subscribe stream.
+                                        //evt.bandwidth is the available bandwidth reported by that stream.
+                                        //evt.msg the status of that stream, depends on the adaptation scheme.
                                         this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
                                     });
 
                                     //流属性更新
+                                    //notifies when the owner of the given stream updates its attributes
                                     stream.addEventListener("stream-attributes-update", (evt) => {
                                         var stream = evt.stream;
                                         this.logList.push('stream-attributes-update ' +  stream.getID() +  evt.msg);
@@ -162,6 +168,10 @@
                             });
                         };
 
+                        //----------------------------------------------------------------------------------------------
+                        // Room Event
+                        // {type:"room-connected", streams:[stream1, stream2]}
+                        //----------------------------------------------------------------------------------------------
                         //4.1 教室连接成功
                         this.room.addEventListener('room-connected', (roomEvent) => {
                             this.logList.push('room-connected ' + this.room.roomID);
@@ -172,7 +182,10 @@
                                 //开始推送本地流
                                 const options = {
                                     metadata      : {type: 'publisher'},
-                                    //maxVideoBW    : 300, //Kbps
+                                    //minVideoBW: 300,
+                                    //scheme:"notify-break" //Same as notify-break but Licode will periodically try to recover the subscriber's video.
+
+                                    //maxVideoBW    : 1000, //Kbps
                                     //startVideoBW  : 1000, //Configures Chrome to start sending video at the specified bitrate instead of the default one
                                     //hardMinVideoBW: 500 //Configures a hard limit for the minimum video bitrate
                                 };
@@ -193,8 +206,23 @@
                             //订阅room中已有流
                             subscribeToStreams(roomEvent.streams);
                         });
+                        this.room.addEventListener("room-error", (evt)=>{
 
+                        });
+                        this.room.addEventListener("room-disconnected", (evt)=>{
+
+                        });
+                        //this.room..disconnect();
+
+                        //----------------------------------------------------------------------------------------------
+                        // Stream Event
+                        //{type:"stream-added", stream:stream1, msg:xx}
+                        //
+                        // Stream对象:
+                        // access-accepted, access-denied, stream-data, stream-attributes-update and bandwidth-alert
+                        //----------------------------------------------------------------------------------------------
                         //4.2 流添加成功
+                        //there is a new stream available in the room.
                         this.room.addEventListener('stream-added', (streamEvent) => {
                             if (this.localStream.getID() === streamEvent.stream.getID()) {
                                 this.logList.push('stream published ' + this.localStream.getID());
@@ -213,6 +241,7 @@
                         //         this.logList.push("Stream unpublished!");
                         //     }
                         // });
+                        //a previous available stream has been removed from the room.
                         this.room.addEventListener('stream-removed', (streamEvent) => {
                             if (this.localStream.getID() === streamEvent.stream.getID()) {
                                 this.logList.push("Unpublished " + this.localStream.getID() );
@@ -249,11 +278,14 @@
                         });
 
                         //4.5 流失败
-                        this.room.addEventListener('stream-failed', () => {
+                        //either in the connection establishment or during the communication.
+                        this.room.addEventListener('stream-failed', (streamEvent) => {
                             this.logList.push('Stream Failed, act accordingly');
                         });
-
-                        //this.room..disconnect();
+                        //probably caused by an hardware disconnection. Emitted only once
+                        this.room.addEventListener('stream-ended', (streamEvent) => {
+                            this.logList.push('Stream Failed, act accordingly');
+                        });
                     }
                 })
             },
