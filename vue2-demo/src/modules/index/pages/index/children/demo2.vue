@@ -43,7 +43,6 @@
         },
         methods   : {
             startRoom() {
-                //1.0 Room config
                 const roomData = {
                     username          : 'user',
                     role              : 'presenter',
@@ -56,21 +55,21 @@
                 createToken({
                     data    : roomData,
                     callback: (response) => {
-                        //1.2 获取token
                         const token = response.token;
 
-                        //1.3 Room Connect
+                        //2.1 Room Connect
                         this.room = Erizo.Room({token});
                         if (this.onlySubscribe) {
                             var singlePC = this.singlePC;
                             this.room.connect({singlePC});
                         }
+                        //2.2 本地流显示
                         else
                         {
-                            //本地流显示
                             this.localStreamInit();
                         }
 
+                        //3.1 room 初始化
                         this.roomInit();
 
                         //日志
@@ -79,7 +78,6 @@
                 })
             },
             localStreamInit(){
-                //1.0 创建本地流
                 const config = {
                     data          : true,
                     audio         : true,
@@ -102,6 +100,7 @@
 
                 //本地流初始化 - 请求摄像头
                 this.localStream.init();
+
                 //indicates that the user has accepted to share his camera and microphone.
                 this.localStream.addEventListener('access-accepted', (event) => {
                     var singlePC = this.singlePC;
@@ -142,7 +141,7 @@
                     }
 
                     //订阅room中已有流
-                    subscribeToStreams(roomEvent.streams);
+                    this.subscribeToStreams(roomEvent.streams);
                 });
                 this.room.addEventListener("room-error", (evt)=>{
 
@@ -188,7 +187,7 @@
                     }
                 });
 
-                //流订阅成功
+                //订阅流
                 this.room.addEventListener('stream-subscribed', (streamEvent) => {
                     const stream = streamEvent.stream;
 
@@ -249,29 +248,29 @@
                                     this.logList.push("Stream subscribed!");
                                 }
                             });
-
-                            //----------------------------------------------------------------------------------------------
-                            // Stream Event
-                            // access-accepted, access-denied, stream-data, stream-attributes-update and bandwidth-alert
-                            //----------------------------------------------------------------------------------------------
-                            // a subscriber stream is reporting less than the minVideoBW specified in the publisher
-                            stream.addEventListener('bandwidth-alert', (evt) => {
-                                //evt.stream is the problematic subscribe stream.
-                                //evt.bandwidth is the available bandwidth reported by that stream.
-                                //evt.msg the status of that stream, depends on the adaptation scheme.
-                                this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
-                            });
-
-                            //流属性更新
-                            //notifies when the owner of the given stream updates its attributes
-                            stream.addEventListener("stream-attributes-update", (evt) => {
-                                var stream = evt.stream;
-                                this.logList.push('stream-attributes-update ' +  stream.getID() +  evt.msg);
-
-                                //var attributes = stream.getAttributes();
-                                //or var attributes = stream.setAttributes({name: 'myStreamUpdated', type: 'private'});
-                            });
                         }
+
+                        //----------------------------------------------------------------------------------------------
+                        // Stream Event
+                        // access-accepted, access-denied, stream-data, stream-attributes-update and bandwidth-alert
+                        //----------------------------------------------------------------------------------------------
+                        // a subscriber stream is reporting less than the minVideoBW specified in the publisher
+                        stream.addEventListener('bandwidth-alert', (evt) => {
+                            //evt.stream is the problematic subscribe stream.
+                            //evt.bandwidth is the available bandwidth reported by that stream.
+                            //evt.msg the status of that stream, depends on the adaptation scheme.
+                            this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
+                        });
+
+                        //流属性更新
+                        //notifies when the owner of the given stream updates its attributes
+                        stream.addEventListener("stream-attributes-update", (evt) => {
+                            var stream = evt.stream;
+                            this.logList.push('stream-attributes-update ' +  stream.getID() +  evt.msg);
+
+                            //var attributes = stream.getAttributes();
+                            //or var attributes = stream.setAttributes({name: 'myStreamUpdated', type: 'private'});
+                        });
                     });
             },
             localStreamPublish()
