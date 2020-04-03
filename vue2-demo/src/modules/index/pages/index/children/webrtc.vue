@@ -363,7 +363,6 @@
     }
 
     .play{
-        width: 300px;
         height: 220px;
     }
 
