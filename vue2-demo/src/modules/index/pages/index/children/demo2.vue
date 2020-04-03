@@ -91,6 +91,7 @@
                         {
                             //本地流初始化 - 请求摄像头
                             this.localStream.init();
+
                             //indicates that the user has accepted to share his camera and microphone.
                             this.localStream.addEventListener('access-accepted', (event) => {
                                 var singlePC = this.singlePC;
@@ -284,8 +285,10 @@
                         });
                         //probably caused by an hardware disconnection. Emitted only once
                         this.room.addEventListener('stream-ended', (streamEvent) => {
-                            this.logList.push('Stream Failed, act accordingly');
+                            this.logList.push('stream-ended');
                         });
+
+                        Erizo.Logger.setLogLevel(3);
                     }
                 })
             },
