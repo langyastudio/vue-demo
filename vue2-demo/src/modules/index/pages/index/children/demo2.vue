@@ -123,12 +123,40 @@
 
                             streams.forEach((stream) => {
                                 if (this.localStream.getID() !== stream.getID()) {
+
                                     var slideShowMode = this.slideShowMode;
 
-                                    this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
+                                    //可以订阅流中的部分数据
+                                    var options = {
+                                        audio     : true,
+                                        video     : true,
+                                        //maxVideoBW: 300, //Kbps
+                                        //Simulcast
+                                        slideShowMode,
+                                        //height: {max: 480}, width: {max: 640},
+                                        //frameRate: {max:20},
+                                        metadata  : {type: 'subscriber'}
+                                    };
+                                    this.room.subscribe(stream, options, (result, error) => {
+
+                                        if (result === undefined){
+                                            this.logList.push("Error subscribing to stream", error);
+                                        } else {
+                                            this.logList.push("Stream subscribed!");
+                                        }
+                                    });
 
                                     stream.addEventListener('bandwidth-alert', (evt) => {
-                                        this.logList.push('Bandwidth Alert', evt.msg, evt.bandwidth);
+                                        this.logList.push('Bandwidth Alert ' + evt.msg + evt.bandwidth);
+                                    });
+
+                                    //流属性更新
+                                    stream.addEventListener("stream-attributes-update", (evt) => {
+                                        var stream = evt.stream;
+                                        this.logList.push('stream-attributes-update ' +  stream.getID() +  evt.msg);
+
+                                        //var attributes = stream.getAttributes();
+                                        //or var attributes = stream.setAttributes({name: 'myStreamUpdated', type: 'private'});
                                     });
                                 }
                             });
@@ -136,26 +164,73 @@
 
                         //4.1 教室连接成功
                         this.room.addEventListener('room-connected', (roomEvent) => {
-                            const options         = {metadata: {type: 'publisher'}};
-                            const enableSimulcast = this.simulcast;
-                            if (enableSimulcast) options.simulcast = {numSpatialLayers: 2};
-
                             this.logList.push('room-connected ' + this.room.roomID);
 
                             //链接成功后，本地推流
                             if (!this.onlySubscribe) {
-                                this.room.publish(this.localStream, options);
+
+                                //开始推送本地流
+                                const options = {
+                                    metadata      : {type: 'publisher'},
+                                    //maxVideoBW    : 300, //Kbps
+                                    //startVideoBW  : 1000, //Configures Chrome to start sending video at the specified bitrate instead of the default one
+                                    //hardMinVideoBW: 500 //Configures a hard limit for the minimum video bitrate
+                                };
+                                if (this.simulcast) {
+                                    // 80 Kbps and the higher to 430 Kbps
+                                    options.simulcast = {numSpatialLayers: 2, spatialLayerBitrates: {0: 80000, 1: 430000}};
+                                }
+
+                                this.room.publish(this.localStream, options, (id, error) => {
+                                    if (id === undefined){
+                                        this.logList.push("Error publishing stream " + error);
+                                    } else {
+                                        this.logList.push("Published stream " + id);
+                                    }
+                                });
                             }
 
-                            //订阅已有流
+                            //订阅room中已有流
                             subscribeToStreams(roomEvent.streams);
                         });
 
-                        //4.2 流订阅成功
+                        //4.2 流添加成功
+                        this.room.addEventListener('stream-added', (streamEvent) => {
+                            if (this.localStream.getID() === streamEvent.stream.getID()) {
+                                this.logList.push('stream published ' + this.localStream.getID());
+                            }
+
+                            const streams = [];
+                            streams.push(streamEvent.stream);
+                            subscribeToStreams(streams);
+                        });
+
+                        //4.3 流移除
+                        // this.room.unpublish(this.localStream, (result, error)=>{
+                        //     if (result === undefined){
+                        //         this.logList.push("Error unpublishing " + error);
+                        //     } else {
+                        //         this.logList.push("Stream unpublished!");
+                        //     }
+                        // });
+                        this.room.addEventListener('stream-removed', (streamEvent) => {
+                            if (this.localStream.getID() === streamEvent.stream.getID()) {
+                                this.logList.push("Unpublished " + this.localStream.getID() );
+                            }
+
+                            // Remove stream from DOM
+                            const stream = streamEvent.stream;
+                            if (stream.elementID !== undefined) {
+                                const element = document.getElementById(stream.elementID);
+                                document.getElementById('videoContainer').removeChild(element);
+                            }
+                        });
+
+                        //4.4 流订阅成功
                         this.room.addEventListener('stream-subscribed', (streamEvent) => {
                             const stream = streamEvent.stream;
 
-                            if(stream.getID() != this.localStream.getID())
+                            if(stream.getID() !== this.localStream.getID())
                             {
                                 this.logList.push('stream-subscribed-' + stream.getID() +
                                     ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
@@ -170,32 +245,15 @@
                                 stream.play(`test${stream.getID()}`);
                             }
                         });
-
-                        //4.3 流添加
-                        this.room.addEventListener('stream-added', (streamEvent) => {
-                            if (this.localStream) {
-                                this.localStream.setAttributes({type: 'publisher'});
-                            }
-
-                            const streams = [];
-                            streams.push(streamEvent.stream);
-                            subscribeToStreams(streams);
-                        });
-
-                        //4.4 流移除
-                        this.room.addEventListener('stream-removed', (streamEvent) => {
-                            // Remove stream from DOM
-                            const stream = streamEvent.stream;
-                            if (stream.elementID !== undefined) {
-                                const element = document.getElementById(stream.elementID);
-                                document.getElementById('videoContainer').removeChild(element);
-                            }
+                        this.room.addEventListener('stream-unsubscribed', (streamEvent) => {
                         });
 
                         //4.5 流失败
                         this.room.addEventListener('stream-failed', () => {
                             this.logList.push('Stream Failed, act accordingly');
                         });
+
+                        //this.room..disconnect();
                     }
                 })
             },
@@ -215,13 +273,42 @@
                     }
                 });
             },
+            //停止本地流
+            StopStream_local()
+            {
+                if(this.localStream)
+                {
+                    this.localStream.stop();
+                }
+            },
             //关闭本地流
-            streamClose()
+            CloseStream_local()
             {
                 if(this.localStream)
                 {
                     this.localStream.close();
                 }
+            },
+            //静音
+            muteAudio(stream, isMuted=true)
+            {
+                //in the publisher's side, will stop sending audio/video data to all its subscribers
+                stream.muteAudio(isMuted, function (result) {
+                    if (result === 'error') {
+                        this.logList.push("There was an error muting the steram")
+                    }
+                });
+            },
+            updateConfig(stream)
+            {
+                var config = {maxVideoBW: 300, maxAudioBW: 300};
+
+                //本地流
+                stream.updateConfiguration(config, function(result) {
+                    console.log(result);
+                });
+                //limiting the lower layer to 80 Kbps and the higher to 430 Kbps.
+                //localStream.updateSimulcastLayersBitrate({0: 80000, 1: 430000});
             }
         }
     }
