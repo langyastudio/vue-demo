@@ -26,14 +26,14 @@
                 roomType          : 'erizo',   //教室类型
                 audioOnly         : false,     //仅仅音频
                 mediaConfiguration: 'default', //媒体配置
-                simulcast         : false,     //多流模式
+                simulcast         : true,      //多流模式
                 slideShowMode     : false,     //低帧率模式
                 //在客户端一个连接上来后，无论发送多少次的Publishe请求，服务器这边只创建一个wbrtc ,就是一个底层连接，通过这种方式，licodce实现了单客户端多流
                 //如果这个参数没有开启，同时客户端发送多次的publish请求，服务这边也会创建多个底层连接等着协商，但是客户端因为是单连接，不会进行协商，所以会连接不成功
-                singlePC          : false,
+                singlePC          : true,
                 onlySubscribe     : false,     //仅订阅
                 onlyPublish       : false,     //仅推流
-                logList           : []
+                logList           : []         //日志列表
             }
         },
         computed  : {},
@@ -126,15 +126,13 @@
                             streams.forEach((stream) => {
                                 if (this.localStream.getID() !== stream.getID()) {
 
-                                    var slideShowMode = this.slideShowMode;
-
                                     //可以订阅流中的部分数据
                                     var options = {
                                         audio     : true,
                                         video     : true,
                                         //maxVideoBW: 300, //Kbps
                                         //Simulcast
-                                        slideShowMode,
+                                        slideShowMode: this.slideShowMode,
                                         //height: {max: 480}, width: {max: 640},
                                         //frameRate: {max:20},
                                         metadata  : {type: 'subscriber'}
@@ -191,8 +189,8 @@
                                     //hardMinVideoBW: 500 //Configures a hard limit for the minimum video bitrate
                                 };
                                 if (this.simulcast) {
-                                    // 80 Kbps and the higher to 430 Kbps
-                                    options.simulcast = {numSpatialLayers: 2, spatialLayerBitrates: {0: 80000, 1: 430000}};
+                                    // 80 Kbps and the higher to 480 Kbps
+                                    options.simulcast = {numSpatialLayers: 2, spatialLayerBitrates: {0: 80000, 1: 480000}};
                                 }
 
                                 this.room.publish(this.localStream, options, (id, error) => {
@@ -340,8 +338,8 @@
                 stream.updateConfiguration(config, function(result) {
                     console.log(result);
                 });
-                //limiting the lower layer to 80 Kbps and the higher to 430 Kbps.
-                //localStream.updateSimulcastLayersBitrate({0: 80000, 1: 430000});
+                //limiting the lower layer to 80 Kbps and the higher to 480 Kbps.
+                //localStream.updateSimulcastLayersBitrate({0: 80000, 1: 480000});
             }
         }
     }
