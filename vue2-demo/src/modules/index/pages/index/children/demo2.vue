@@ -140,7 +140,7 @@
                                     this.room.subscribe(stream, options, (result, error) => {
 
                                         if (result === undefined){
-                                            this.logList.push("Error subscribing to stream", error);
+                                            this.logList.push("Error subscribing to stream " + error);
                                         } else {
                                             this.logList.push("Stream subscribed!");
                                         }
@@ -268,7 +268,7 @@
                     if (this.localStream.getID() !== stream.getID()) {
                         var slideShowMode = this.slideShowMode;
                         stream.updateConfiguration({slideShowMode}, (evt) => {
-                            this.logList.push('SlideShowMode changed', evt);
+                            this.logList.push('SlideShowMode changed ' +  evt);
                         });
                     }
                 });
