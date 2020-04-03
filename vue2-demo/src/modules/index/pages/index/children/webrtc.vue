@@ -1,7 +1,9 @@
 <template>
     <el-container>
         <el-main>
-            <div id="videoContainer"></div>
+            <div id="videoContainer">
+                <div class="custom-stream" v-for="(stream,index) in streamList" :key="index" :id="stream.id"></div>
+            </div>
         </el-main>
         <el-footer>
             <el-card class="box-card">
@@ -33,7 +35,8 @@
                 singlePC          : true,
                 onlySubscribe     : false,     //仅订阅
                 onlyPublish       : false,     //仅推流
-                logList           : []         //日志列表
+                logList           : [],       //日志列表
+                streamList        : [],
             }
         },
         computed  : {},
@@ -105,18 +108,17 @@
                     var singlePC = this.singlePC;
                     this.room.connect({singlePC});
 
-                    const div = document.createElement('div');
-                    div.setAttribute('style', 'width: 300px; height: 220px; float:left');
-                    div.setAttribute('id', 'myVideo');
-                    document.getElementById('videoContainer').appendChild(div);
-
-                    //播放本地流
-                    var options = {
-                        speaker: false,//显示音频条
-                        crop   : true //裁剪视频
-                    };
-                    this.localStream.play('myVideo', options);
-
+                    this.streamList.push({
+                        id: 'myVideo'
+                    })
+                    this.$nextTick(() => {
+                        //播放本地流
+                        var options = {
+                            speaker: false,//显示音频条
+                            crop   : true //裁剪视频
+                        };
+                        this.localStream.play('myVideo', options);
+                    })
                     //此时还无法获取流相关的信息，因为仅仅同意打开设备
                     this.logList.push('local stream Access to webcam and/or microphone accepted');
                 });
@@ -180,8 +182,10 @@
                     // Remove stream from DOM
                     const stream = streamEvent.stream;
                     if (stream.elementID !== undefined) {
-                        const element = document.getElementById(stream.elementID);
-                        document.getElementById('videoContainer').removeChild(element);
+                        this.streamList = this.streamList.filter((fitem) => {
+                            return fitem.id != stream.elementID
+
+                        })
                     }
                 });
 
@@ -194,13 +198,14 @@
                             ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
                             ' hasData-' + stream.hasData());
 
-                        const div = document.createElement('div');
-                        div.setAttribute('style', 'width: 300px; height: 220px;float:left;');
-                        div.setAttribute('id', `test${stream.getID()}`);
+                        this.streamList.push({
+                            id: `test${stream.getID()}`
+                        })
 
-                        document.getElementById('videoContainer').appendChild(div);
+                        this.$nextTick(() => {
+                            stream.play(`test${stream.getID()}`);
+                        })
 
-                        stream.play(`test${stream.getID()}`);
                     }
                 });
 
@@ -344,17 +349,24 @@
 </script>
 
 <style lang="scss" scoped rel="stylesheet/scss">
-    .container {
-        width: 1170px;
-        margin: 0 auto;
-        min-height: 900px;
+    #videoContainer {
+        &:after {
+            content : "";
+            display : block;
+            clear   : both;
+        }
+        .custom-stream {
+            width  : 300px;
+            height : 220px;
+            float  : left;
+        }
     }
 
     .text {
-        font-size: 14px;
+        font-size : 14px;
     }
 
     .item {
-        padding: 8px 0;
+        padding : 8px 0;
     }
 </style>
