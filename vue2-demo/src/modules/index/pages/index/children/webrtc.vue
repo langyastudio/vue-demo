@@ -2,12 +2,17 @@
     <el-container>
         <el-main>
             <el-row>
-                <el-col :span="6" v-for="playId in playList" :key="playId">
+                <el-col :span="6" v-for="playItem in playList" :key="playItem" class="play-list-item">
                     <el-card class="card">
-                        <div :id="playId" class="play">
-                        </div>
+                        <div :id="playItem.id" class="play"></div>
                         <div style="padding: 14px;">
-                            <span>好吃的汉堡</span>
+                            <div class="hk-pd-v-5 oper-menu">
+                                <span @click="zoomIn" class="el-icon-zoom-in"></span>
+                                <span class="el-icon-zoom-out"></span>
+                                <span  :class="{'el-icon-microphone':playItem.hasAudio,'el-icon-turn-off-microphone':!playItem.hasAudio}"></span>
+                                <span  :class="{'el-icon-video-play':playItem.hasVideo,'el-icon-video-pause':!playItem.hasVideo}"></span>
+
+                            </div>
                         </div>
                     </el-card>
                 </el-col>
@@ -116,7 +121,13 @@
                     var singlePC = this.singlePC;
                     this.room.connect({singlePC});
 
-                    this.playList.push('myVideo');
+
+                    this.playList.push({
+                        id:'myVideo',
+                        hasAudio:this.localStream.hasAudio(),
+                        hasVideo:this.localStream.hasVideo(),
+                        hasData:this.localStream.hasData()
+                    });
                     this.$nextTick(() => {
                         //播放本地流
                         var options = {
@@ -189,10 +200,11 @@
                     // Remove stream from DOM
                     const stream = streamEvent.stream;
                     if (stream.elementID !== undefined) {
-                        var index = this.playList.indexOf(stream.elementID);
-                        if (index > -1) {
-                            this.playList.splice(index, 1);
-                        }
+                        this.playList = this.playList.filter((fitem) => {
+
+                            return fitem.id != stream.elementID
+
+                        })
                     }
                 });
 
@@ -205,7 +217,12 @@
                             ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
                             ' hasData-' + stream.hasData());
 
-                        this.playList.push(`test${stream.getID()}`);
+                        this.playList.push({
+                            id:`test${stream.getID()}`,
+                            hasAudio:stream.hasAudio(),
+                            hasVideo:stream.hasVideo(),
+                            hasData:stream.hasData()
+                        });
                         this.$nextTick(() => {
                             stream.play(`test${stream.getID()}`);
                         });
@@ -347,11 +364,22 @@
                     }
                 });
             },
+
+            //放大
+            zoomIn(){
+
+            },
+            zoomOut(){
+
+            },
+
         }
     }
 </script>
 
 <style lang="scss" scoped rel="stylesheet/scss">
+
+    @import "~@/style/common/variable";
     .container {
         width: 1170px;
         margin: 0 auto;
@@ -361,6 +389,22 @@
     /deep/ .card > .el-card__body{
         padding: 0 !important;
     }
+    .play-list-item{
+        .oper-menu{
+            display: flex;
+            span{
+                font-size:24px;
+                cursor: pointer;
+                flex: 1;
+                padding:5px 0;
+                text-align: center;
+                &:hover{
+                    color:$text-hover-color
+                }
+            }
+        }
+    }
+
 
     .play{
         height: 220px;
