@@ -2,7 +2,7 @@
     <el-container>
         <el-main>
             <el-row>
-                <el-col :span="6" v-for="playId in playList">
+                <el-col :span="6" v-for="playId in playList" :key="playId">
                     <el-card class="card">
                         <div :id="playId" class="play">
                         </div>
