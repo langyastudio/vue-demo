@@ -1,5 +1,16 @@
 <template>
-    <div id="videoContainer"></div>
+    <el-container>
+        <el-main>
+            <div id="videoContainer"></div>
+        </el-main>
+        <el-footer>
+            <el-card class="box-card">
+                <div v-for="log in logList"  class="text item">
+                    {{log}}
+                </div>
+            </el-card>
+        </el-footer>
+    </el-container>
 </template>
 
 <script>
@@ -22,6 +33,7 @@
                 singlePC          : false,
                 onlySubscribe     : false,     //仅订阅
                 onlyPublish       : false,     //仅推流
+                logList           : []
             }
         },
         computed  : {},
@@ -33,19 +45,22 @@
             StartRoom() {
                 //1.0 创建本地流
                 const config = {
+                    data          : true,
                     audio         : true,
                     video         : !this.audioOnly,
-                    data          : true,
+                    attributes    : {username:'用户名' + Math.random()},
+                    videoSize     : [640, 480, 640, 480], //[minWidth, minHeight, maxWidth, maxHeight]
+                    videoFrameRate: [10, 30],
                     screen        : this.screen,
-                    attributes    : {},
-                    videoSize     : [640, 480, 640, 480],
-                    videoFrameRate: [10, 30]
+                    //url:"rtsp://user:pass@the_server_url:port" //支持使用rtsp作为本地流
                 };
-                // If we want screen sharing we have to put our Chrome extension id.
-                // The default one only works in our Lynckia test servers.
-                // If we are not using chrome, the creation of the stream will fail regardless.
+                //need https protocol
+                //The Stream API is currently using the MediaDevices.getDisplayMedia() method.
+                //The MediaDevices.getUserMedia() method can be still used for sharing the screen by specifying an extensionId or desktopStreamId.
+                //Additionally, in Chrome, you can use your own extension outside of Licode and directly pass the chromeMediaSourceId as a parameter
                 if (this.screen) {
                     config.extensionId = 'okeephmleflklcdebijnponpabbmmgeo';
+                    //config.desktopStreamId = 'ID_PROVIDED_BY_YOUR_EXTENSION';
                 }
                 this.localStream = Erizo.Stream(config);
 
@@ -74,17 +89,29 @@
                         //1.1 本地流显示
                         else
                         {
-                            const div = document.createElement('div');
-                            div.setAttribute('style', 'width: 320px; height: 240px; float:left');
-                            div.setAttribute('id', 'myVideo');
-                            document.getElementById('videoContainer').appendChild(div);
-
                             //本地流初始化 - 请求摄像头
                             this.localStream.init();
-                            this.localStream.addEventListener('access-accepted', () => {
+                            this.localStream.addEventListener('access-accepted', (event) => {
                                 var singlePC = this.singlePC;
                                 this.room.connect({singlePC});
-                                this.localStream.show('myVideo');
+
+                                const div = document.createElement('div');
+                                div.setAttribute('style', 'width: 320px; height: 240px; float:left');
+                                div.setAttribute('id', 'myVideo');
+                                document.getElementById('videoContainer').appendChild(div);
+
+                                //播放本地流
+                                var options = {
+                                    speaker: false,//显示音频条
+                                    crop   : true //裁剪视频
+                                };
+                                this.localStream.play('myVideo', options);
+
+                                //此时还无法获取流相关的信息，因为仅仅同意打开设备
+                                this.logList.push('local stream Access to webcam and/or microphone accepted' );
+                            });
+                            this.localStream.addEventListener('access-denied', (event) => {
+                                this.logList.push('local stream Access to webcam and/or microphone rejected' );
                             });
                         }
 
@@ -99,8 +126,9 @@
                                     var slideShowMode = this.slideShowMode;
 
                                     this.room.subscribe(stream, {slideShowMode, metadata: {type: 'subscriber'}});
+
                                     stream.addEventListener('bandwidth-alert', (evt) => {
-                                        console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
+                                        this.logList.push('Bandwidth Alert', evt.msg, evt.bandwidth);
                                     });
                                 }
                             });
@@ -112,10 +140,13 @@
                             const enableSimulcast = this.simulcast;
                             if (enableSimulcast) options.simulcast = {numSpatialLayers: 2};
 
+                            this.logList.push('room-connected ' + this.room.roomID);
+
                             //链接成功后，本地推流
                             if (!this.onlySubscribe) {
                                 this.room.publish(this.localStream, options);
                             }
+
                             //订阅已有流
                             subscribeToStreams(roomEvent.streams);
                         });
@@ -124,13 +155,20 @@
                         this.room.addEventListener('stream-subscribed', (streamEvent) => {
                             const stream = streamEvent.stream;
 
-                            const div    = document.createElement('div');
-                            div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
-                            div.setAttribute('id', `test${stream.getID()}`);
+                            if(stream.getID() != this.localStream.getID())
+                            {
+                                this.logList.push('stream-subscribed-' + stream.getID() +
+                                    ' hasAudio-' + stream.hasAudio() + ' hasVideo-' + stream.hasVideo() +
+                                    ' hasData-' + stream.hasData());
 
-                            document.getElementById('videoContainer').appendChild(div);
+                                const div    = document.createElement('div');
+                                div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
+                                div.setAttribute('id', `test${stream.getID()}`);
 
-                            stream.show(`test${stream.getID()}`);
+                                document.getElementById('videoContainer').appendChild(div);
+
+                                stream.play(`test${stream.getID()}`);
+                            }
                         });
 
                         //4.3 流添加
@@ -156,7 +194,7 @@
 
                         //4.5 流失败
                         this.room.addEventListener('stream-failed', () => {
-                            console.log('Stream Failed, act accordingly');
+                            this.logList.push('Stream Failed, act accordingly');
                         });
                     }
                 })
@@ -172,11 +210,19 @@
                     if (this.localStream.getID() !== stream.getID()) {
                         var slideShowMode = this.slideShowMode;
                         stream.updateConfiguration({slideShowMode}, (evt) => {
-                            console.log('SlideShowMode changed', evt);
+                            this.logList.push('SlideShowMode changed', evt);
                         });
                     }
                 });
             },
+            //关闭本地流
+            streamClose()
+            {
+                if(this.localStream)
+                {
+                    this.localStream.close();
+                }
+            }
         }
     }
 </script>
@@ -186,5 +232,12 @@
         width: 1170px;
         margin: 0 auto;
         min-height: 900px;
+    }
+    .text {
+        font-size: 14px;
+    }
+
+    .item {
+        padding: 8px 0;
     }
 </style>
