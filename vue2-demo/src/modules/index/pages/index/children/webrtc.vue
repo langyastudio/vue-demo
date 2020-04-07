@@ -1,14 +1,14 @@
 <template>
-    <el-container>
-        <el-main>
-            <el-row>
-                <el-col :span="6" v-for="playItem in playList" :key="playItem" class="play-list-item">
-                    <el-card class="card">
-                        <div :id="playItem.id" class="play"></div>
-                    </el-card>
-                </el-col>
-            </el-row>
-        </el-main>
+    <div>
+        <div class="play-body">
+            <div v-for="playItem in playList"
+                 :key="playItem"
+                 class="play-list-item play"
+                 @transitionend="transitionEnd($event,playItem)"
+                 @dblclick="zoomToggle(playItem)" :id="playItem.id"
+                 :class="{'play-down':playItem.down,'play-scale':playItem.scale}">
+            </div>
+        </div>
         <el-footer>
             <el-card class="box-card">
                 <div v-for="log in logList" class="text item">
@@ -16,7 +16,7 @@
                 </div>
             </el-card>
         </el-footer>
-    </el-container>
+    </div>
 </template>
 
 <script>
@@ -361,6 +361,25 @@
                     }
                 });
             },
+            zoomToggle(item){
+                if(item.recovery){
+                    item.scale = false
+                    item.down = false
+                }else{
+                    item.down = true
+
+                }
+            },
+            transitionEnd(e,item){
+                if(!item.recovery){
+                    if(e.propertyName == 'top'){
+                        item.scale = true
+                    }
+                }
+                if(e.propertyName == 'height'){
+                    item.recovery = !item.recovery
+                }
+            }
 
         }
     }
@@ -372,14 +391,43 @@
     .container {
         width: 1170px;
         margin: 0 auto;
-        min-height: 900px;
+        min-height: 600px;
     }
 
     /deep/ .card > .el-card__body{
         padding: 0 !important;
     }
     .play{
+        width: 25%;
+        float: left;
         height: 220px;
+        background-color: #424242;
+        transition-duration: .3s;
+        transition-property: width,height,left,top;
+        transition-timing-function: ease-in-out;
+        position: absolute;
+        top:0;
+
+
+
+
+    }
+
+
+    .play-down{
+        top      : 220px;
+    }
+    .play-scale{
+        width    : 100%;
+        height   : 100%;
+
+
+    }
+    .play-body{
+        height: 220px;
+
+        padding:0 20px;
+        margin-bottom:24px;
     }
 
     .text {

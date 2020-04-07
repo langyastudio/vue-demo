@@ -8,7 +8,6 @@
                 </keep-alive>
             </el-col>
         </el-row>
-        <foot-bootom></foot-bootom>
     </div>
 </template>
 
