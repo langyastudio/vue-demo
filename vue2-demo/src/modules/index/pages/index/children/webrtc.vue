@@ -5,15 +5,6 @@
                 <el-col :span="6" v-for="playItem in playList" :key="playItem" class="play-list-item">
                     <el-card class="card">
                         <div :id="playItem.id" class="play"></div>
-                        <div style="padding: 14px;">
-                            <div class="hk-pd-v-5 oper-menu">
-                                <span @click="zoomIn" class="el-icon-zoom-in"></span>
-                                <span class="el-icon-zoom-out"></span>
-                                <span  :class="{'el-icon-microphone':playItem.hasAudio,'el-icon-turn-off-microphone':!playItem.hasAudio}"></span>
-                                <span  :class="{'el-icon-video-play':playItem.hasVideo,'el-icon-video-pause':!playItem.hasVideo}"></span>
-
-                            </div>
-                        </div>
                     </el-card>
                 </el-col>
             </el-row>
@@ -126,7 +117,10 @@
                         id:'myVideo',
                         hasAudio:this.localStream.hasAudio(),
                         hasVideo:this.localStream.hasVideo(),
-                        hasData:this.localStream.hasData()
+                        hasData:this.localStream.hasData(),
+                        scale:false,
+                        down:false,
+                        recovery:false
                     });
                     this.$nextTick(() => {
                         //播放本地流
@@ -221,7 +215,10 @@
                             id:`test${stream.getID()}`,
                             hasAudio:stream.hasAudio(),
                             hasVideo:stream.hasVideo(),
-                            hasData:stream.hasData()
+                            hasData:stream.hasData(),
+                            scale:false,
+                            down:false,
+                            recovery:false
                         });
                         this.$nextTick(() => {
                             stream.play(`test${stream.getID()}`);
@@ -365,14 +362,6 @@
                 });
             },
 
-            //放大
-            zoomIn(){
-
-            },
-            zoomOut(){
-
-            },
-
         }
     }
 </script>
@@ -389,23 +378,6 @@
     /deep/ .card > .el-card__body{
         padding: 0 !important;
     }
-    .play-list-item{
-        .oper-menu{
-            display: flex;
-            span{
-                font-size:24px;
-                cursor: pointer;
-                flex: 1;
-                padding:5px 0;
-                text-align: center;
-                &:hover{
-                    color:$text-hover-color
-                }
-            }
-        }
-    }
-
-
     .play{
         height: 220px;
     }
