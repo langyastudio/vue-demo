@@ -51,49 +51,65 @@
 
             setTimeout(() => {
 
-                this.room.unpublish(this.localStream)
+                this.unPublishLocalStream()
 
             },2000)
             setTimeout(() => {
-               this.localStreamInit()
+               this.startRoom()
 
             },10000)
 
         },
         methods   : {
+            unPublishLocalStream(){
+                if (this.localStream) {
+                    this.room.unpublish(this.localStream);
+                    this.playList = this.playList.filter((fitem) => {
+
+                        return fitem.id != 'myVideo'
+
+                    })
+                }
+
+            },
             startRoom() {
-                const roomData = {
-                    username          : 'user',
-                    role              : 'presenter',
-                    room              : this.roomId,
-                    type              : this.roomType,
-                    mediaConfiguration: this.mediaConfiguration
-                };
+                if(!this.room){
+                    const roomData = {
+                        username          : 'user',
+                        role              : 'presenter',
+                        room              : this.roomId,
+                        type              : this.roomType,
+                        mediaConfiguration: this.mediaConfiguration
+                    };
 
-                //1.1 请求Token
-                createToken({
-                    data    : roomData,
-                    callback: (response) => {
-                        const token = response.token;
+                    //1.1 请求Token
+                    createToken({
+                        data    : roomData,
+                        callback: (response) => {
+                            const token = response.token;
 
-                        //2.1 Room Connect
-                        this.room = Erizo.Room({token});
-                        if (this.onlySubscribe) {
-                            var singlePC = this.singlePC;
-                            this.room.connect({singlePC});
+                            //2.1 Room Connect
+                            this.room = Erizo.Room({token});
+                            if (this.onlySubscribe) {
+                                var singlePC = this.singlePC;
+                                this.room.connect({singlePC});
+                            }
+                            //2.2 本地流显示
+                            else {
+                                this.localStreamInit();
+                            }
+
+                            //3.1 room 初始化
+                            this.roomInit();
+
+                            //日志
+                            Erizo.Logger.setLogLevel(3);
                         }
-                        //2.2 本地流显示
-                        else {
-                            this.localStreamInit();
-                        }
+                    })
+                }else{
+                    this.localStreamInit();
+                }
 
-                        //3.1 room 初始化
-                        this.roomInit();
-
-                        //日志
-                        Erizo.Logger.setLogLevel(3);
-                    }
-                })
             },
             localStreamInit() {
                 const config = {
