@@ -28,7 +28,7 @@
                 room              : '',        //room 对象
                 localStream       : '',        //本地流对象
                 screen            : false,     //桌面分享
-                roomId            : '20200402',//教室Id号
+                roomId            : '20200403',//教室Id号
                 roomType          : 'erizo',   //教室类型
                 audioOnly         : false,     //仅仅音频
                 mediaConfiguration: 'default', //媒体配置
@@ -47,6 +47,18 @@
         components: {},
         mounted() {
             this.startRoom();
+
+
+            setTimeout(() => {
+
+                this.room.unpublish(this.localStream)
+
+            },2000)
+            setTimeout(() => {
+               this.localStreamInit()
+
+            },10000)
+
         },
         methods   : {
             startRoom() {
@@ -109,9 +121,22 @@
 
                 //indicates that the user has accepted to share his camera and microphone.
                 this.localStream.addEventListener('access-accepted', (event) => {
-                    var singlePC = this.singlePC;
-                    this.room.connect({singlePC});
+                    if(this.room && this.room.state == 0){
+                        var singlePC = this.singlePC;
+                        this.room.connect({singlePC});
+                    }
+                    if(this.room.state == 2){
+                        //链接成功后，本地推流
+                        if (!this.onlySubscribe) {
+                            this.localStreamPublish();
+                        }
 
+                        //订阅room中已有流
+                        this.subscribeToStreams(this.room.remoteStreams);
+                    }
+
+
+                    this.playList = [];
 
                     this.playList.push({
                         id:'myVideo',
