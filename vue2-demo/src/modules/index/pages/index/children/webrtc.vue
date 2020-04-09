@@ -63,12 +63,15 @@
         methods   : {
             unPublishLocalStream(){
                 if (this.localStream) {
-                    this.room.unpublish(this.localStream);
-                    this.playList = this.playList.filter((fitem) => {
+                    if(this.localStream.showing){
+                        this.room.unpublish(this.localStream);
+                        this.playList = this.playList.filter((fitem) => {
 
-                        return fitem.id != 'myVideo'
+                            return fitem.id != 'myVideo'
 
-                    })
+                        })
+                    }
+
                 }
 
             },
@@ -107,7 +110,10 @@
                         }
                     })
                 }else{
-                    this.localStreamInit();
+                    if(!this.localStream.showing){
+                        this.localStreamInit();
+                    }
+
                 }
 
             },
@@ -367,13 +373,19 @@
             //停止本地流
             stopLocalStream() {
                 if (this.localStream) {
-                    this.localStream.stop();
+                    if(this.localStream.showing){
+                        this.localStream.stop();
+                    }
+
                 }
             },
             //关闭本地流
             closeLocalStream() {
                 if (this.localStream) {
-                    this.localStream.close();
+                    if(this.localStream.showing){
+                        this.localStream.close();
+                    }
+
                 }
             },
             updateConfig(stream) {
