@@ -1,0 +1,67 @@
+// cover some element-ui styles
+
+.el-dialog__wrapper {
+  overflow : hidden !important;
+}
+
+.el-popover {
+  p {
+    line-height : 22px;
+  }
+}
+
+//修复IE10 级联菜单readonly 点击后显示光标
+.cascader-wrap input[readonly] {
+  font-size      : 0 \0
+;
+  vertical-align : top \0
+;
+}
+
+.el-menu-item.is-active {
+  cursor : default !important;
+}
+
+.el-button--primary:focus {
+  color            : #fff;
+  background-color : #409eff;
+  border-color     : #409eff;
+}
+
+.el-button--primary:hover {
+  background   : #66b1ff;
+  border-color : #66b1ff;
+  color        : #fff;
+}
+
+.el-cascader-menu {
+  min-width : 150px;
+  .el-cascader-menu__item {
+    min-width : 150px \0
+  ;
+  }
+}
+
+//修复IE10 弹出页面晃动的问题
+.el-cascader-menus.el-popper {
+  position : absolute;
+  top      : 0
+}
+
+.el-menu-item i {
+  margin-right   : 5px;
+  width          : 24px;
+  text-align     : center;
+  font-size      : 16px;
+  vertical-align : middle;
+
+}
+
+.el-cascader-menu__item--extensible:after {
+  right : 3px;
+}
+
+
+.el-pagination {
+  font-weight : normal !important;
+}
